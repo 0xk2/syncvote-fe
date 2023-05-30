@@ -1,0 +1,27 @@
+.modal {
+  &.active-proposal-modal {
+    padding: 0;
+    max-width: 100%;
+    //width: calc(500px + 2rem);
+    & > .active-proposal-content {
+      width: calc(512px + 48px);
+      max-width: 100%;
+      margin: 0;
+      padding: 0 24px;
+      overflow: scroll;
+      height: calc(90vh - 4rem);
+
+      /* Change color of scrollbar track */
+      ::-webkit-scrollbar {
+        background-color: red;
+        width: 12px;
+      }
+
+      /* Change color of scrollbar thumb */
+      ::-webkit-scrollbar-thumb {
+        background-color: red;
+        border-radius: 10px;
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+.bg-connect {
+  background-image: url('/public/assets/images/connect-wallet-bg.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: calc(100vh - 80px);
+}
+
+.translate {
+  transform: translate(-50%, 0);
+}

@@ -1,0 +1,30 @@
+.my-swiper-prev {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  width: 36px;
+  height: 36px;
+  border-radius: 100%;
+
+  img {
+    margin: auto;
+  }
+}
+
+.my-swiper-next {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  width: 36px;
+  height: 36px;
+  border-radius: 100%;
+  left: auto;
+  right: calc(20% - 55px);
+  top: 10%;
+
+  img {
+    margin: auto;
+  }
+}
+
+.swiper-button-disabled {
+  opacity: 1;
+}
