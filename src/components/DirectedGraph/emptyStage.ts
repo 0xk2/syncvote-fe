@@ -1,4 +1,4 @@
-import ICheckPoint from './interfaces';
+import { ICheckPoint } from './interfaces';
 
 const rootCheckPoint: ICheckPoint = {
   id: 'root',

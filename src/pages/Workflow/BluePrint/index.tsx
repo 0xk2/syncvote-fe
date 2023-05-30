@@ -248,12 +248,21 @@ const BluePrint = () => {
                       newData.checkpoints[index].data = {
                         ...changedData.data,
                       };
-                      const toClone = ['children', 'title', 'description', 'locked', 'triggers'];
-                      toClone.forEach((key) => {
-                        if (changedData[key]) {
-                          newData.checkpoints[index][key] = changedData[key];
-                        }
-                      });
+                      if (changedData.children) {
+                        newData.checkpoints[index].children = changedData.children;
+                      }
+                      if (changedData.title) {
+                        newData.checkpoints[index].title = changedData.title;
+                      }
+                      if (changedData.description) {
+                        newData.checkpoints[index].description = changedData.description;
+                      }
+                      if (changedData.locked) {
+                        newData.checkpoints[index].locked = changedData.locked;
+                      }
+                      if (changedData.triggers) {
+                        newData.checkpoints[index].triggers = changedData.triggers;
+                      }
                       newData.checkpoints[index].isEnd = changedData.isEnd === true;
                       if (changedData.isEnd === true) {
                         newData.checkpoints[index].children = [];
@@ -282,7 +291,7 @@ const BluePrint = () => {
                   } else {
                     const newData = structuredClone(versionData);
                     const index = newData.checkpoints.findIndex((v:any) => v.id === id);
-                    newData.checkpoints?.forEach((_node:any) => {
+                    newData.checkpoints?.forEach((_node:any, index: number) => {
                       if (_node.children?.includes(id)) {
                         let newChkpData;
                         switch (_node.vote_machine_type) {
@@ -299,7 +308,7 @@ const BluePrint = () => {
                           default:
                             newChkpData = _node.data;
                         }
-                        _node.data = newChkpData;
+                        newData.checkpoints[index].data = newChkpData;
                         if (_node.children) {
                           _node.children.splice(_node.children.indexOf(id));
                         }

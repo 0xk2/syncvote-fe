@@ -8,8 +8,8 @@ export interface ICheckPoint {
   vote_machine_type?: string,
   isEnd?: boolean,
   duration?: number,
-  enforcers?: IEnforcer[],
   locked?: any,
+  triggers?: any[],
 }
 
 export interface IEnforcer {

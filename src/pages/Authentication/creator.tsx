@@ -1,17 +1,16 @@
-
 import { L } from '@utils/locales/L';
 import Google from '@assets/icons/svg-icons/Google';
 import ButtonLogin from '@components/ButtonLogin';
-import { useState } from 'react';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { Modal } from 'antd';
 
 function CreatorLogin() {
   const dispatch = useDispatch();
-  const handleLogin = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleLogin = async () => {
     dispatch(startLoading({}));
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         queryParams: {
@@ -20,9 +19,12 @@ function CreatorLogin() {
         },
       },
     });
-    dispatch(finishLoading());
+    dispatch(finishLoading({}));
     if (error) {
-      alert(error.error_description || error.message)
+      Modal.error({
+        title: L('error'),
+        content: error.message || '',
+      });
     }
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { L } from '@utils/locales/L';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkNode } from '@redux/reducers/check-node.reducer';
@@ -10,9 +10,7 @@ import moment from 'moment';
 import { queryWorkflow } from '@utils/data';
 import { initialize, setWorkflows } from '@redux/reducers/ui.reducer';
 
-type Props = {};
-
-const BuildInitiative = (props: Props) => {
+const BuildInitiative = () => {
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const ui = useSelector((state: any) => state.ui);
@@ -22,7 +20,6 @@ const BuildInitiative = (props: Props) => {
   const handleNavigate = () => {
     const { ROOT, WF_TEMPLATES } = PAGE_ROUTES.WORKFLOW;
     const path = `/${ROOT}/${WF_TEMPLATES}`;
-    console.log({ path });
     navigate(path, { state: { previousPath: `/${PAGE_ROUTES.INITIATIVE.ROOT}` } });
   };
   const dispatch = useDispatch();
@@ -38,7 +35,7 @@ const BuildInitiative = (props: Props) => {
   }
   useEffect(() => {
     const workflows = allWorkflows.filter((w: any) => w.owner_org_id === orgId);
-    const tmp = [];
+    const tmp:any[] = [];
     workflows.map((w: any) => {
       w.workflow_version.map((v:any) => {
         if (v.status === 'PUBLISHED' && v.recommended === true) {

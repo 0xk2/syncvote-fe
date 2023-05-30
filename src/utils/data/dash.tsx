@@ -1,4 +1,5 @@
 import { finishLoading, startLoading } from '../../redux/reducers/ui.reducer';
+
 const BASE_URL = 'https://decisiontree.herokuapp.com';
 
 export const create = async ({
@@ -13,7 +14,9 @@ export const create = async ({
   onError?: (error:any) => void;
   dispatch: any;
 }) => {
-  let toSend = {};
+  let toSend = {
+    title: '', desc: '',
+  };
   try {
     toSend = JSON.parse(json);
   } catch (e) {

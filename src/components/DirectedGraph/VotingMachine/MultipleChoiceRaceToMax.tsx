@@ -57,7 +57,7 @@ const ConfigPanel = ({
     description: '',
   });
   const possibleOptions:any[] = [];
-  let maxStr = 0;
+  let maxStr = '0';
   if (max) {
     maxStr = max < 1 ? `${max * 100}%` : `${max}`;
   }
@@ -75,7 +75,7 @@ const ConfigPanel = ({
       nextTitle = node.title ? node.title : node.id;
     }
   });
-  const renderChildren = (type, val) => {
+  const renderChildren = (type:any, val:any) => {
     return (
       !val ?
         (
@@ -88,7 +88,7 @@ const ConfigPanel = ({
               style={{ width: '200px' }}
               options={possibleOptions}
               onChange={(value) => {
-                const newData = structuredClone(data);
+                const newData:any = structuredClone(data);
                 newData[type] = value; //eslint-disable-line
                 onChange({
                   data: newData,
@@ -106,7 +106,7 @@ const ConfigPanel = ({
               className="flex items-center text-red-500"
               icon={<DeleteOutlined />}
               onClick={() => {
-                const newData = structuredClone(data);
+                const newData:any = structuredClone(data);
                 delete newData[type];
                 const newChildren = [...children];
                 const idx = children.indexOf(val);
@@ -129,7 +129,7 @@ const ConfigPanel = ({
     <Space direction="vertical" size="large" className="mb-4 w-full">
       <Space direction="vertical" size="small" className="w-full">
         <div className="text-lg">Poll Vote</div>
-        <div className="bg-slate-100 p-2 w-full">{`Everyone choose up to ${upTo || 'X'} options until ${upTo || 'X'} options reach ${max || 'condition to pass'}`}</div>
+        <div className="bg-slate-100 p-2 w-full">{`Everyone choose up to ${upTo || 'X'} options until ${upTo || 'X'} options reach ${maxStr || 'condition to pass'}`}</div>
       </Space>
       <Space direction="vertical" size="small" className="w-full">
         <div className="text-md">Min no of vote to pass (e.g: 3, 10%)</div>

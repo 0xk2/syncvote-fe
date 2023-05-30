@@ -5,8 +5,7 @@ import Button from '@components/Button/Button';
 import { initialize, setWorkflows } from '@redux/reducers/ui.reducer';
 import { queryAMission, queryWorkflow, upsertAMission } from '@utils/data';
 import { createIdString, extractIdFromIdString } from '@utils/helpers';
-import { L } from '@utils/locales/L';
-import { Modal, Switch, Tag } from 'antd';
+import { Modal, Tag } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
@@ -121,7 +120,6 @@ const NewMission = () => {
                     } catch (e) {
                       return rs;
                     }
-                    console.log(rs);
                     return rs;
                   })()}
                   onNodeClick={() => {}}
@@ -137,7 +135,6 @@ const NewMission = () => {
         <div className="flex flex-col gap-4 w-full">
           <div>
             <Icon
-              className="w-[100%] border border-primary_logo"
               editable={currentMission.status !== 'PUBLISHED'}
               iconUrl={currentMission.icon_url}
               onUpload={({ filePath, isPreset }: {

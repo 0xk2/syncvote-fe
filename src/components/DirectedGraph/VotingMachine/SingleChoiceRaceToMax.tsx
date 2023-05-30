@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  BranchesOutlined, CarryOutOutlined, DeleteOutlined, PlusCircleOutlined
+  BranchesOutlined, CarryOutOutlined, DeleteOutlined, PlusCircleOutlined,
 } from '@ant-design/icons';
 import {
   Input, Select, Space, Button, Tag,
@@ -23,7 +23,6 @@ const deleteChildNode = (data: IData, children:string[], childId:string) => {
     return result;
   }
   result.splice(index, 1);
-  console.log('result after splice: ',result);
   return { ...data, options: result };
 };
 
@@ -48,9 +47,9 @@ const ConfigPanel = ({
   onChange = (data:ICheckPoint) => {}, children = [], allNodes = [], //eslint-disable-line
 }:Config) => {
   const { max, options } = data;
-  let max_str = 0;
+  let maxStr = '0';
   if (max) {
-    max_str = max < 1 ? `${max * 100}%` : `${max}`;
+    maxStr = max < 1 ? `${max * 100}%` : `${max}`;
   }
   const posibleOptions:ICheckPoint[] = [];
   allNodes.forEach((child) => {
@@ -80,7 +79,7 @@ const ConfigPanel = ({
                 <CarryOutOutlined className="inline-flex items-center pr-2" />
               </div>
             )}
-            value={max_str}
+            value={maxStr}
             onChange={(e) => {
               const str = e.target.value;
               let tMax = 0;

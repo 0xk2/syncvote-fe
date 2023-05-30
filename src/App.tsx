@@ -8,24 +8,23 @@ import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/gotrue-js';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  setOrgs, setPresetBanners, setPresetIcons, startLoading, finishLoading, initialize, setWorkflows
+  setOrgs, setPresetBanners, setPresetIcons, startLoading, finishLoading, initialize,
 } from '@redux/reducers/ui.reducer';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
-import { queryWorkflow } from '@utils/data';
+
 // TODO: too many dispatch
 function App() {
   // const [isAuth, setIsAuth] = useState(false);
   const navigate = useNavigate();
   // const token = window.localStorage.getItem('isConnectWallet');
   const [session, setSession] = useState<Session | null>(null);
-  let {
+  const {
     orgs, presetIcons, presetBanners, initialized,
   } = useSelector((state:any) => state.ui);
   const dispatch = useDispatch();
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
     if (_session === null) {
-      console.log('navigate to login');
       navigate(PAGE_ROUTES.LOGIN);
     }
     if (_session !== null && (presetIcons.length === 0 || presetBanners.length === 0)) {
@@ -35,11 +34,10 @@ function App() {
       .from('preset_images')
       .list('icon', { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
       if (!iconError) {
-        const tmp = [];
-        iconData.map(d => {
+        const tmp:any[] = [];
+        iconData.forEach((d) => {
           tmp.push(d.name);
         });
-        presetIcons = tmp;
         dispatch(setPresetIcons(tmp));
       }
       const { data: bannerData, error: bannerError } = await supabase
@@ -47,18 +45,16 @@ function App() {
       .from('preset_images')
       .list('banner', { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
       if (!bannerError) {
-        const tmp = [];
-        bannerData.map(d => {
+        const tmp:any[] = [];
+        bannerData.forEach((d) => {
           tmp.push(d.name);
         });
-        presetBanners = tmp;
         dispatch(setPresetBanners(tmp));
       }
     }
     if (_session !== null && initialized === false && orgs.length === 0) {
       // TODO: this line will break the code if user has no orgs
       const { user } = _session as Session;
-      console.log('orgs.length: ',orgs.length);
       const { data, error } = await supabase.from('user_org')
       .select(`
         role,
@@ -75,22 +71,24 @@ function App() {
         )
       `).eq('user_id', user.id);
       if (!error) {
-        const tmp = [];
-        data.map(d => {
-          const preset_icon = d.org.preset_icon_url? 'preset:'+d.org.preset_icon_url:d.org.preset_icon_url;
-          const preset_banner = d.org.preset_banner_url? 'preset:'+d.org.preset_banner_url:d.org.preset_banner_url;
+        const tmp:any[] = [];
+        data.forEach((d) => {
+          const org:any = d?.org || {
+            id: '', title: '', desc: '',
+          };
+          const presetIcon = org?.preset_icon_url ? `preset:${org.preset_icon_url}` : org.preset_icon_url;
+          const presetBanner = org?.preset_banner_url ? `preset:${org.preset_banner_url}` : org.preset_banner_url;
           tmp.push({
-            id: d.org.id,
+            id: org?.id,
             role: d.role,
-            title: d.org.title,
-            desc: d.org.desc,
-            icon_url: d.org.icon_url ? d.org.icon_url : preset_icon,
-            banner_url: d.org.banner_url ? d.org.banner_url : preset_banner,
-            org_size: d.org.org_size,
-            org_type: d.org.org_type
+            title: org?.title,
+            desc: org.desc,
+            icon_url: org.icon_url ? org.icon_url : presetIcon,
+            banner_url: org.banner_url ? org.banner_url : presetBanner,
+            org_size: org.org_size,
+            org_type: org.org_type,
           });
         });
-        orgs = tmp;
         dispatch(setOrgs(tmp));
       }
       dispatch(initialize({}));
