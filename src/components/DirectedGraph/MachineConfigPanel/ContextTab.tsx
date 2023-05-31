@@ -1,10 +1,10 @@
 import {
-  Button, Checkbox, Collapse, Input, Popconfirm, Space, Switch,
+  Button, Collapse, Input, Popconfirm, Space, Switch,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { LockFilled, UnlockOutlined } from '@ant-design/icons';
 
-import { ICheckPoint } from '../interfaces';
+import { ICheckPoint } from '../../../types';
 
 const ContextTab = ({
   selectedNode = {}, onChange, children,
