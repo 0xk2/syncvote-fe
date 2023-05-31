@@ -1,22 +1,23 @@
 import React, { memo } from 'react';
-import { BaseEdge, EdgeLabelRenderer, EdgeProps } from 'reactflow';
+import {
+  BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath,
+} from 'reactflow';
 
 // TODO: think of a better name
 const Path = memo((props: EdgeProps) => {
   const {
-    sourceX, sourceY, targetX, targetY, id, markerEnd, style, label, //eslint-disable-line
+    sourceX, sourceY, targetX, targetY, markerEnd, style, label, sourcePosition, targetPosition,
+    id, //eslint-disable-line
   } = props;
-  const radiusX = (sourceX - targetX) * 0.6;
-  const radiusY = 50;
-  const edgePath = `M ${sourceX} ${sourceY} A ${radiusX} ${radiusY} 0 1 0 ${
-    targetX
-  } ${targetY}`;
-  const labelX = (sourceX + targetX) / 2;
-  const labelY = (sourceY + targetY) / 2 - radiusY - 28;
-
+  const bezierOpts = getBezierPath({
+    sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition,
+  });
+  const path = bezierOpts[0];
+  const labelX = bezierOpts[1];
+  const labelY = bezierOpts[2];
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <BaseEdge path={path} markerEnd={markerEnd} style={style} />
       <EdgeLabelRenderer>
         <div
           style={{
@@ -38,12 +39,12 @@ const Path = memo((props: EdgeProps) => {
 });
 
 const getTypeName = () => {
-  return 'selfconnecting';
+  return 'beziercustomedge';
 };
 
 const getType = () => {
   return {
-    selfconnecting: Path,
+    beziercustomedge: Path,
   };
 };
 

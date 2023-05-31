@@ -1,5 +1,8 @@
 import { PlusOutlined, TwitterOutlined } from '@ant-design/icons';
-import { Button, Input, Space } from 'antd';
+import {
+  Button, Input, Space, Tag,
+} from 'antd';
+import { useState } from 'react';
 
 const getName = () => 'twitter';
 const getIcon = () => <TwitterOutlined />;
@@ -13,7 +16,7 @@ const Add = ({
   const {
     username,
   } = data;
-  let tweet = '';
+  const [tmpTweet, setTmpTweet] = useState<string>('');
   return (
     <Space direction="vertical" className="w-full" size="large">
       <Space direction="vertical" className="w-full flex justify-between" size="small">
@@ -22,8 +25,9 @@ const Add = ({
           {` from ${username}`}
         </div>
         <Input.TextArea
+          value={tmpTweet}
           onChange={(e) => {
-            tweet = e.target.value;
+            setTmpTweet(e.target.value);
           }}
         />
       </Space>
@@ -33,7 +37,8 @@ const Add = ({
           className="flex items-center"
           icon={<PlusOutlined />}
           onClick={() => {
-            onChange({ ...data, tweet });
+            onChange({ ...data, tweet: tmpTweet });
+            setTmpTweet('');
           }}
         >
           Add
@@ -45,14 +50,22 @@ const Add = ({
 
 const Display = (data: any) => {
   const {
-    username, tweet,
+    username, tweet, allNodes, triggerAt,
   } = data;
+  const title = triggerAt === 'this' ? 'this' : allNodes.find((node:any) => node.id === triggerAt).title;
   return (
-    <div>
-      {username}
-      :
-      {tweet}
-    </div>
+    <Space direction="vertical" size="small">
+      <Space direction="horizontal" size="middle">
+        <Tag>
+          {username}
+        </Tag>
+        {tweet}
+      </Space>
+      <div>
+        <Tag className="mr-2">Trigger at</Tag>
+        {title}
+      </div>
+    </Space>
   );
 };
 

@@ -4,7 +4,7 @@ import { finishLoading, startLoading } from '../../redux/reducers/ui.reducer';
 export const queryWorkflow = async ({
   orgId, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
-  }, dispatch, filter = {},
+  }, dispatch, filter = {}, // eslint-disable-line
 }: {
   orgId: number;
   onLoad: (data: any) => void;
@@ -12,18 +12,18 @@ export const queryWorkflow = async ({
   dispatch: any;
   filter?: any;
 }) => {
-  console.log(filter);
   dispatch(startLoading({}));
   const { data, error } = await supabase.from('workflow').select('*, workflow_version ( * )').eq('owner_org_id', orgId).order('created_at', { ascending: false });
   dispatch(finishLoading({}));
   if (data) {
-    data.forEach((d) => {
-      d.icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
-      d.banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
-      delete d.preset_icon_url;
-      delete d.preset_banner_url;
+    const newData = structuredClone(data);
+    data.forEach((d:any, index: number) => {
+      newData[index].icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
+      newData[index].banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
+      delete newData[index].preset_icon_url;
+      delete newData[index].preset_banner_url;
     });
-    onLoad(data);
+    onLoad(newData);
   } else if (error) {
     onError(error);
   }
@@ -31,7 +31,7 @@ export const queryWorkflow = async ({
 export const queryMission = async ({
   orgId, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
-  }, dispatch, filter = {},
+  }, dispatch, filter = {}, // eslint-disable-line
 }: {
   orgId: number;
   onLoad: (data: any) => void;
@@ -39,7 +39,6 @@ export const queryMission = async ({
   dispatch: any;
   filter?: any;
 }) => {
-  console.log(filter);
   dispatch(startLoading({}));
   const { data, error } = await supabase.from('mission').select('*').eq('owner_org_id', orgId);
   dispatch(finishLoading({}));
@@ -63,13 +62,14 @@ export const queryAMission = async ({
   const { data, error } = await supabase.from('mission').select('*').eq('id', missionId);
   dispatch(finishLoading({}));
   if (data) {
-    data.forEach(d => {
-      d.icon_url = d.icon_url ? d.icon_url : `preset:${d.preset_icon_url}`;
-      d.banner_url = d.banner_url ? d.banner_url : `preset:${d.preset_banner_url}`;
-      delete d.preset_icon_url;
-      delete d.preset_banner_url;
+    const newData = [...data];
+    data.forEach((d:any, index:number) => {
+      newData[index].icon_url = d.icon_url ? d.icon_url : `preset:${d.preset_icon_url}`;
+      newData[index].banner_url = d.banner_url ? d.banner_url : `preset:${d.preset_banner_url}`;
+      delete newData[index].preset_icon_url;
+      delete newData[index].preset_banner_url;
     });
-    onLoad(data);
+    onLoad(newData);
   } else if (error) {
     onError(error);
   }
@@ -100,13 +100,14 @@ export const upsertAMission = async ({
   const { data, error } = await supabase.from('mission').upsert(newMission).select();
   dispatch(finishLoading({}));
   if (data) {
-    data.forEach((d) => {
-      d.icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
-      d.banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
-      delete d.preset_icon_url;
-      delete d.preset_banner_url;
+    const newData = [...data];
+    newData.forEach((d: any, index:number) => {
+      newData[index].icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
+      newData[index].banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
+      delete newData[index].preset_icon_url;
+      delete newData[index].preset_banner_url;
     });
-    onLoad(data);
+    onLoad(newData);
   } else if (error) {
     onError(error);
   }
@@ -143,13 +144,14 @@ export const upsertAnOrg = async ({
   const { data, error } = await supabase.from('org').upsert(newOrg).select();
   dispatch(finishLoading({}));
   if (data) {
-    data.forEach((d) => {
-      d.icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
-      d.banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
-      delete d.preset_icon_url;
-      delete d.preset_banner_url;
+    const newData = [...data];
+    data.forEach((d: any, index:number) => {
+      newData[index].icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
+      newData[index].banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
+      delete newData[index].preset_icon_url;
+      delete newData[index].preset_banner_url;
     });
-    onLoad(data);
+    onLoad(newData);
   } else if (error) {
     onError(error);
   }

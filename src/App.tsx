@@ -11,6 +11,10 @@ import {
   setOrgs, setPresetBanners, setPresetIcons, startLoading, finishLoading, initialize,
 } from '@redux/reducers/ui.reducer';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
+import { registerVoteMachine } from '@components/DirectedGraph';
+
+import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
+import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
 
 // TODO: too many dispatch
 function App() {
@@ -113,6 +117,8 @@ function App() {
         dispatch(finishLoading({}));
       }
     });
+    registerVoteMachine(SingleChoiceRaceToMax);
+    registerVoteMachine(MultipleChoiceRaceToMax);
   }, []);
   return (
     <div className="w-full">

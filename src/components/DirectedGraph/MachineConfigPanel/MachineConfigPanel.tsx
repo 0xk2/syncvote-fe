@@ -1,19 +1,19 @@
 import {
   Tabs,
 } from 'antd';
-import { IEnforcer, ICheckPoint } from '../interfaces';
+import { ICheckPoint } from '../../../types';
 import ContextTab from './ContextTab';
 import RulesTab from './RulesTab';
 import TriggerTab from './TriggerTab';
 
 const MachineConfigPanel = ({
-  children, selectedNode, onChange, enforcers, web2Integrations,
+  children, selectedNode, onChange, web2Integrations, allNodes,
 }:{
   children: any,
   selectedNode: any,
   onChange: (changedData:ICheckPoint) => void,
-  enforcers: IEnforcer[],
   web2Integrations: any[],
+  allNodes: any[],
 }) => {
   const items = [
     {
@@ -44,8 +44,9 @@ const MachineConfigPanel = ({
         web2Integrations={web2Integrations}
         triggers={selectedNode?.triggers || []}
         onChange={onChange}
-        children={selectedNode.children}
+        children={selectedNode?.children}
         selectedNode={selectedNode}
+        allNodes={allNodes}
       />,
     },
   ];

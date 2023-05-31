@@ -20,11 +20,10 @@ import {
 } from '@ant-design/icons';
 import {
   DirectedGraph,
+  renderVoteMachineConfigPanel,
   getVoteMachine,
   emptyStage,
   ICheckPoint,
-  SingleChoiceRaceToMax,
-  MultipleChoiceRaceToMax,
 } from '@components/DirectedGraph';
 
 const { TextArea } = AntdInput;
@@ -128,13 +127,13 @@ const BluePrint = () => {
     }).select();
     dispatch(finishLoading({}));
     setOpen(false);
-    clearSelectedVersion();
+    // clearSelectedVersion();
     if (data) {
       queryWorkflow({
         orgId,
-        onLoad: (data) => {
-          dispatch(setWorkflows(data));
-          extractWorkflowFromList(data);
+        onLoad: (_data:any) => {
+          dispatch(setWorkflows(_data));
+          extractWorkflowFromList(_data);
         },
         dispatch,
       });
@@ -237,7 +236,7 @@ const BluePrint = () => {
                 }}
               />
             </Modal>
-            {getVoteMachine({
+            {renderVoteMachineConfigPanel({
                 web2Integrations: web2IntegrationsState,
                 versionData,
                 selectedNodeId,
@@ -293,21 +292,10 @@ const BluePrint = () => {
                     const index = newData.checkpoints.findIndex((v:any) => v.id === id);
                     newData.checkpoints?.forEach((_node:any, index: number) => {
                       if (_node.children?.includes(id)) {
-                        let newChkpData;
-                        switch (_node.vote_machine_type) {
-                          case SingleChoiceRaceToMax.getName():
-                            newChkpData = SingleChoiceRaceToMax.deleteChildNode(
-                              _node.data, _node.children, id,
-                            );
-                            break;
-                          case MultipleChoiceRaceToMax.getName():
-                            newChkpData = MultipleChoiceRaceToMax.deleteChildNode(
-                              _node.data, _node.children, id,
-                            );
-                            break;
-                          default:
-                            newChkpData = _node.data;
-                        }
+                        const newChkpData = getVoteMachine(_node.vote_machine_type)
+                        ?.deleteChildNode(
+                          _node.data, _node.children, id,
+                        ) || _node.data;
                         newData.checkpoints[index].data = newChkpData;
                         if (_node.children) {
                           _node.children.splice(_node.children.indexOf(id));

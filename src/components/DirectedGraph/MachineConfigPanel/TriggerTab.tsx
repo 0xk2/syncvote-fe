@@ -2,8 +2,9 @@ import { IIntegration } from '@pages/Organization/interface';
 import {
   Button, Collapse, Drawer, Select, Space,
 } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import Paragraph from 'antd/es/typography/Paragraph';
 import Twitter from '../Enforcer/Twitter';
 
 interface ITrigger {
@@ -30,13 +31,14 @@ const getProvider = (provider:string) => {
 };
 
 const TriggerTab = ({
-  web2Integrations, triggers, onChange, children, selectedNode,
+  web2Integrations, triggers, onChange, children, selectedNode, allNodes,
 }:{
   web2Integrations: IIntegration[],
   triggers: ITrigger[],
   onChange: (data:any) => void,
   children: any[],
   selectedNode: any,
+  allNodes: any[],
 }) => {
   const [showAddTriggerDrawer, setShowAddTriggerDrawer] = useState(false);
   const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
@@ -50,7 +52,7 @@ const TriggerTab = ({
   });
   const selectedIntegration = web2Integrations?.find(
     (integration) => integration.id === selectedIntegrationId);
-  const addElement = getProvider(selectedIntegration?.provider || '').Add;
+  const AddElement = getProvider(selectedIntegration?.provider || '').Add;
   const triggerAtOptions = [
     {
       id: 'this',
@@ -58,11 +60,15 @@ const TriggerTab = ({
       value: 'this',
     },
   ];
-  children?.forEach((child) => {
+  children?.forEach((childId) => {
+    let title = allNodes.find((n) => n.id === childId).title || childId;
+    if (title.length > 20) {
+      title = `${title.slice(0, 20)}...`;
+    }
     triggerAtOptions.push({
-      id: child,
-      label: `when - ${child} is choosen`,
-      value: child,
+      id: childId,
+      label: `'${title}' is choosen`,
+      value: childId,
     });
   });
   return (
@@ -74,17 +80,47 @@ const TriggerTab = ({
               const display = getProvider(trigger.provider).Display;
               return (
                 <Collapse.Panel
-                  header={trigger.name}
-                  key={trigger.id || trigger.name}
+                  header={
+                    (
+                      <Paragraph
+                        style={{ marginBottom: '0px' }}
+                        editable={{
+                          onChange: (name) => {
+                            const newTriggers = [...triggers];
+                            newTriggers[index].name = name;
+                            onChange({
+                              ...selectedNode,
+                              triggers: newTriggers,
+                            });
+                          },
+                        }}
+                      >
+                        {trigger.name}
+                      </Paragraph>
+                    )
+                  }
+                  key={trigger.id || Math.random()}
                   extra={(
-                    <EditOutlined
-                      onClick={() => {
-                        console.log('edit ',trigger.id,'; index: ',index);
-                      }}/>
+                    <Space direction="horizontal" size="middle">
+                      <DeleteOutlined
+                        className="text-red-500"
+                        onClick={() => {
+                          const tmpSelectedNode = structuredClone(selectedNode);
+                          const tmpTriggers = [...triggers];
+                          tmpTriggers.splice(index, 1);
+                          onChange({
+                            ...tmpSelectedNode,
+                            triggers: tmpTriggers,
+                          });
+                        }}
+                      />
+                    </Space>
                   )}
                 >
                   <div>
-                    {display(trigger)}
+                    {display({
+                      ...trigger, allNodes,
+                    })}
                   </div>
                 </Collapse.Panel>
               );
@@ -93,6 +129,7 @@ const TriggerTab = ({
       </Collapse>
       <Button
         type="default"
+        className="w-full"
         onClick={() => {
           setShowAddTriggerDrawer(true);
         }}
@@ -115,47 +152,47 @@ const TriggerTab = ({
             }}
             className="w-full"
           />
-          <Space direction="vertical" className="w-full" size="small">
-            <div>Trigger when</div>
-            {selectedIntegrationId ?
-              (
-                <Select
-                  options={triggerAtOptions}
-                  className="w-full"
-                  value={selectedTriggerAt}
-                  onChange={(value) => {
-                    setSelectedTriggerAt(value);
-                  }}
-                />
-              )
-              :
-              null}
-            {addElement({
-              data: selectedIntegration,
-              onChange: (data) => {
-                const tmpData = structuredClone(data);
-                const tmpSelectedNode = structuredClone(selectedNode);
-                tmpData.integrationId = selectedIntegrationId;
-                delete tmpData.id;
-                delete tmpData.access_token;
-                delete tmpData.refresh_token;
-                delete tmpData.refresh_token_expires_at;
-                delete tmpData.created_at;
-                delete tmpData.scope;
-                delete tmpData.updated_at;
-                onChange({
-                  ...tmpSelectedNode,
-                  triggers: [...triggers, {
-                    provider: selectedIntegration?.provider,
-                    name: `Trigger#${triggers.length + 1}`,
-                    triggerAt: selectedTriggerAt,
-                    ...tmpData,
-                  }],
-                });
-                setShowAddTriggerDrawer(false);
-              },
-            })}
-          </Space>
+          {selectedIntegrationId ?
+          (
+            <Space direction="vertical" className="w-full" size="small">
+              <div>Trigger when</div>
+              <Select
+                options={triggerAtOptions}
+                className="w-full"
+                value={selectedTriggerAt}
+                onChange={(value) => {
+                  setSelectedTriggerAt(value);
+                }}
+              />
+              <AddElement
+                data={selectedIntegration}
+                onChange={(data:any) => {
+                  const tmpData = structuredClone(data);
+                  const tmpSelectedNode = structuredClone(selectedNode);
+                  tmpData.integrationId = selectedIntegrationId;
+                  delete tmpData.id;
+                  delete tmpData.access_token;
+                  delete tmpData.refresh_token;
+                  delete tmpData.refresh_token_expires_at;
+                  delete tmpData.created_at;
+                  delete tmpData.scope;
+                  delete tmpData.updated_at;
+                  onChange({
+                    ...tmpSelectedNode,
+                    triggers: [...triggers, {
+                      provider: selectedIntegration?.provider,
+                      name: `Trigger#${triggers.length + 1}`,
+                      triggerAt: selectedTriggerAt,
+                      ...tmpData,
+                    }],
+                  });
+                  setShowAddTriggerDrawer(false);
+                }}
+              />
+            </Space>
+          )
+          :
+          null}
         </Space>
       </Drawer>
     </Space>

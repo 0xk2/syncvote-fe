@@ -9,9 +9,10 @@ import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
 import MultipleDirectNode from './MultipleDiretionNode';
 import SelfConnectingEdge from './SelfConnectingEdge';
+import BezierCustomEdge from './BezierCustomEdge';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
-const edgeTypes = { ...SelfConnectingEdge.getType() };
+const edgeTypes = { ...SelfConnectingEdge.getType(), ...BezierCustomEdge.getType() };
 
 interface IFlow {
   data?: any, // eslint-disable-line

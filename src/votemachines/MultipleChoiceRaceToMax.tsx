@@ -6,20 +6,11 @@ import {
 } from 'antd';
 import { useState } from 'react';
 
+import { IVoteMachine, IVoteMachineGetLabelProps, IVoteMachineConfigProps } from '../types';
+
 interface Option {
   title: string,
   description: string,
-}
-interface Config {
-  id: string,
-  data: IData,
-  mode?: Mode,
-  whitelist?: string[],
-  votingPowerProvider?: string,
-  splNftCollection?: string,
-  onChange: (data:any) => void,
-  children?: string[],
-  allNodes: any[],
 }
 
 interface IData { //eslint-disable-line
@@ -41,15 +32,15 @@ const deleteChildNode = (data: IData, children:string[], childId:string) => { //
 };
 
 const ConfigPanel = ({
-  id, mode = Mode.WhiteList, votingPowerProvider = '', whitelist = [], splNftCollection = '', onChange = (data) => {}, children = [], //eslint-disable-line
+  currentNodeId, votingPowerProvider = '', whitelist = [], onChange = (data) => {}, children = [], //eslint-disable-line
   data = {
     max: 0,
     upTo: 1,
     options: [],
     next: '',
     fallback: '',
-  }, allNodes //eslint-disable-line
-}: Config) => {
+  }, allNodes,
+}: IVoteMachineConfigProps) => {
   // TODO: config `upTo`
   const {
     max, options, next, fallback, upTo,
@@ -67,7 +58,7 @@ const ConfigPanel = ({
   let nextTitle = next;
   let fallbackTitle = fallback;
   allNodes.forEach((node) => {
-    if (node.id !== fallback && node.id !== next && node.id !== id) {
+    if (node.id !== fallback && node.id !== next && node.id !== currentNodeId) {
       possibleOptions.push({
         value: node.id,
         label: node.title ? node.title : node.id,
@@ -210,7 +201,7 @@ const ConfigPanel = ({
         (
           <Space direction="vertical" size="small" className="w-full">
             <div>List of options</div>
-            {options?.map((option, index) => (
+            {options?.map((option:any, index:any) => (
               <div key={option.title}>
                 <Button
                   className="mr-2"
@@ -292,19 +283,36 @@ const ConfigPanel = ({
   );
 };
 
-const getName = () => {
+const getProgramAddress = () => {
   return 'MultipleChoiceRaceToMax';
 };
 
-enum Mode {
-  WhiteList,
-  SPL_NFT,
-  EVM_NFT,
-}
-
-export default {
-  ConfigPanel,
-  getName,
-  Mode,
-  deleteChildNode,
+/**
+ * Providing both getType and getProgramAddress enables the same program with different views
+ * @returns Type of the voting machine
+ */
+const getType = () => {
+  return 'MultipleChoiceRaceToMax';
 };
+
+const getName = () => {
+  return 'Poll Vote';
+};
+
+const getLabel = (props : IVoteMachineGetLabelProps) => {
+  // label = source?.data.next === target?.id ? 'Next' : 'Fallback';
+  const { source, target } = props;
+  return source?.data.next === target?.id ? (<span>Next</span>) : (<span>Fallback</span>);
+};
+// label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
+
+const VoteMachine : IVoteMachine = {
+  ConfigPanel,
+  getProgramAddress,
+  getName,
+  deleteChildNode,
+  getLabel,
+  getType,
+};
+
+export default VoteMachine;

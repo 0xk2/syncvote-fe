@@ -75,12 +75,13 @@ const Node = memo(({ data, isConnectable = true, id }: {
           {
           data.triggers && data.triggers.length > 0 ?
             data.triggers.map((trigger:any) => {
-              const icon = trigger.provider === 'twitter' ? <TwitterOutlined /> : trigger.provider;
+              const icon = trigger.provider === 'twitter' ? <TwitterOutlined key={trigger.id || Math.random()} /> : <span key={trigger.id || Math.random()}>{trigger.provider}</span>;
               if (trigger.triggerAt === 'this') {
                 return (
                   icon
                 );
               }
+              return null;
             })
           :
           null
