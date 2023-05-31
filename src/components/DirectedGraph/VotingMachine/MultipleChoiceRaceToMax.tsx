@@ -1,6 +1,8 @@
-import { CarryOutOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
-  Button, Input, Select, Space, Tag,
+  CarryOutOutlined, DeleteOutlined, NodeIndexOutlined, PlusOutlined,
+} from '@ant-design/icons';
+import {
+  Button, Drawer, Input, Select, Space, Tag,
 } from 'antd';
 import { useState } from 'react';
 
@@ -56,6 +58,7 @@ const ConfigPanel = ({
     title: '',
     description: '',
   });
+  const [showNewOptionDrawer, setShowNewOptionDrawer] = useState(false);
   const possibleOptions:any[] = [];
   let maxStr = '0';
   if (max) {
@@ -79,11 +82,11 @@ const ConfigPanel = ({
     return (
       !val ?
         (
-          <>
+          <Space direction="horizontal" className="flex items-center" size="small">
             <div>
-              Choose Next
-              {type === 'next' ? ' CheckPoint' : 'Fallback' }
+              {type === 'next' ? 'If we found winner then ' : 'If voting is over and we can not find winners, then ' }
             </div>
+            <NodeIndexOutlined />
             <Select
               style={{ width: '200px' }}
               options={possibleOptions}
@@ -96,11 +99,11 @@ const ConfigPanel = ({
                 });
               }}
             />
-          </>
+          </Space>
         )
         :
         (
-          <Space direction="horizontal">
+          <Space direction="horizontal" size="small">
             <Button
               type="link"
               className="flex items-center text-red-500"
@@ -117,8 +120,8 @@ const ConfigPanel = ({
                 });
               }}
             />
-            {type === 'next' ? 'Next' : 'Fallback'}
-            :
+            {type === 'next' ? 'Winner found' : 'No winner found'}
+            <NodeIndexOutlined />
             {type === 'next' ? <Tag>{nextTitle}</Tag> : <Tag>{fallbackTitle}</Tag>}
           </Space>
         )
@@ -231,50 +234,58 @@ const ConfigPanel = ({
         )
         : <></>
       }
-      <Space direction="vertical" size="small" className="w-full">
-        <Space direction="horizontal" className="flex justify-between">
-          <span>
-            New Option
-          </span>
+      <Button
+        icon={<PlusOutlined />}
+        className="w-full"
+        onClick={() => { setShowNewOptionDrawer(true); }}
+      >
+        New Option
+      </Button>
+      <Drawer
+        open={showNewOptionDrawer}
+        onClose={() => { setShowNewOptionDrawer(false); }}
+        title="New Option"
+      >
+        <Space direction="vertical" size="small" className="w-full">
+          <div className="text-slate-700">Title</div>
+          <Input
+            type="text"
+            className="w-full"
+            value={newOption.title}
+            onChange={(e) => {
+              setNewOption({
+                ...newOption,
+                title: e.target.value,
+              });
+            }}
+          />
+          <div className="text-slate-700">Description</div>
+          <Input.TextArea
+            className="w-full"
+            value={newOption.description}
+            onChange={(e) => {
+              setNewOption({
+                ...newOption,
+                description: e.target.value,
+              });
+            }}
+          />
           <Button
-            type="link"
+            type="default"
+            className="w-full"
             icon={<PlusOutlined />}
             onClick={() => {
               setNewOption({ title: '', description: '' });
+              setShowNewOptionDrawer(false);
               onChange({
                 data: { ...data, options: options ? [...options, newOption] : [newOption] },
               });
             }}
-          />
+          >
+            Add
+          </Button>
         </Space>
-        <Input
-          type="text"
-          className="w-full"
-          prefix={(
-            <div className="text-slate-300">
-              Title
-            </div>
-          )}
-          value={newOption.title}
-          onChange={(e) => {
-            setNewOption({
-              ...newOption,
-              title: e.target.value,
-            });
-          }}
-        />
-        <div className="text-slate-500">Description</div>
-        <Input.TextArea
-          className="w-full"
-          value={newOption.description}
-          onChange={(e) => {
-            setNewOption({
-              ...newOption,
-              description: e.target.value,
-            });
-          }}
-        />
-      </Space>
+      </Drawer>
       {renderChildren('next', next)}
       {renderChildren('fallback', fallback)}
     </Space>
