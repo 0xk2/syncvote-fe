@@ -6,9 +6,10 @@ import moment from 'moment';
 
 import { ICheckPoint } from '../../../types';
 
-const RulesTab = ({ selectedNode, onChange }:{
+const RulesTab = ({ selectedNode, onChange, editable = false }:{
   selectedNode:ICheckPoint,
   onChange: (changedData:ICheckPoint) => void,
+  editable?: boolean,
 }) => {
   const duration = selectedNode?.data?.duration;
   const days = duration ? Math.floor(duration / 86400) : 0;
@@ -72,17 +73,31 @@ const RulesTab = ({ selectedNode, onChange }:{
                   onChange(newNode);
                 }
               }}
+              disabled={!editable}
             />
           </Space>
         </Collapse.Panel>
         <Collapse.Panel header="Participation" key="2">
           <Select
             style={{ width: '100%' }}
+            defaultValue="whitelist"
             options={[
               {
-                key: 'address',
-                label: 'Address',
-                value: 'address',
+                key: 'whitelist',
+                label: 'A lits of addresses',
+                value: 'whitelist',
+              },
+              // choosing this option would engage Votemachine
+              {
+                key: 'spl',
+                label: 'A SPL Token owner',
+                value: 'spl',
+              },
+              // choosing this option would engage Votemachine
+              {
+                key: 'erc20',
+                label: 'An ERC20 Token owner',
+                value: 'erc20',
               },
             ]}
           />
@@ -90,21 +105,17 @@ const RulesTab = ({ selectedNode, onChange }:{
         <Collapse.Panel header="Voting Power Provider" key="3">
           <Select
             style={{ width: '100%' }}
+            defaultValue="default"
             options={[
               {
-                key: 'count',
-                label: 'None, each particiapnt has 1 vote',
+                key: 'default',
+                label: 'Use voting power provided by voting program',
                 value: '',
               },
               {
                 key: 'a_system_owned_address',
                 label: 'Provide by SyncVote',
                 value: 'a_system_owned_address',
-              },
-              {
-                key: 'a_program_id',
-                label: 'Provide by Program Vote123',
-                value: 'a_program_id',
               },
             ]}
           />

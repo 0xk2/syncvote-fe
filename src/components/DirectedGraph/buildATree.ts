@@ -87,7 +87,7 @@ const buildEdge = ({
     id: `${source.id}-${target.id}`,
     source: source.id,
     target: target.id,
-    label: label,
+    label,
     sourceHandle,
     targetHandle,
     style,
@@ -134,23 +134,20 @@ export const buildATree = (data:any, selectedNodeId:string | undefined) => {
   };
   const iterEdge = (node:any) => {
     const buildLabel = ({
-      voteMachine, data: _data, idx, source, target,
+      voteMachine, source, target,
     } : {
       voteMachine: string,
-      data: any,
-      idx: number,
       source: any,
       target: any,
     }) => {
-      let label = '';
       const vm:IVoteMachine = getVoteMachine(voteMachine);
-      return vm.getLabel({source, target});;
+      return vm.getLabel({ source, target });
     };
 
     if (!node.edgeConstructed && node.children && node.children.length > 0) {
       node.edgeConstructed = true; // eslint-disable-line no-param-reassign
       const sourceId = node.id;
-      node.children.forEach((childId:string, idx:number) => {
+      node.children.forEach((childId:string) => {
         const child = checkpoints.find((_node) => _node.id === childId);
         let edgeStyle = {};
         if (selectedNodeId && sourceId === selectedNodeId) {
@@ -163,8 +160,6 @@ export const buildATree = (data:any, selectedNodeId:string | undefined) => {
           target: nodes.find((_node) => _node.id === childId),
           label: buildLabel({
             voteMachine: node.vote_machine_type,
-            data: node.data,
-            idx,
             source: node,
             target: child,
           }),

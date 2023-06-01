@@ -3,8 +3,8 @@ import ReactFlow, {
   useOnViewportChange,
 } from 'reactflow';
 import React, { useEffect, useCallback } from 'react';
-import { Button } from 'antd';
-import { PlusOutlined, RestOutlined } from '@ant-design/icons';
+import { Button, Space } from 'antd';
+import { PlusOutlined, VerticalAlignMiddleOutlined } from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
 import MultipleDirectNode from './MultipleDiretionNode';
@@ -25,6 +25,7 @@ interface IFlow {
   nodes?: any, // eslint-disable-line
   edges?: any, // eslint-disable-line
   onViewPortChange?: (viewport:any) => void,
+  editable?: boolean, // eslint-disable-line
 }
 
 const Flow = ({
@@ -36,6 +37,7 @@ const Flow = ({
   onViewPortChange = () => {},
   nodes,
   edges,
+  editable = true,
 }: IFlow) => {
   useOnViewportChange({
     onChange: useCallback((viewport: any) => {
@@ -56,8 +58,10 @@ const Flow = ({
       <Controls />
       <Background color="#aaa" variant={BackgroundVariant.Dots} />
       <Panel position="top-left">
-        <Button type="ghost" icon={<RestOutlined />} onClick={onResetPosition}>Reset Position</Button>
-        <Button type="ghost" icon={<PlusOutlined />} onClick={onAddNewNode}>Add CheckPoint</Button>
+        <Space direction="horizontal">
+          <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
+          <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
+        </Space>
       </Panel>
     </ReactFlow>
   );
@@ -71,6 +75,7 @@ const DirectedGraph = ({
   onResetPosition = () => {},
   onAddNewNode = () => {},
   onViewPortChange = () => {},
+  editable = true,
 }: IFlow) => {
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -94,6 +99,7 @@ const DirectedGraph = ({
           onResetPosition={onResetPosition}
           onAddNewNode={onAddNewNode}
           onViewPortChange={onViewPortChange}
+          editable={editable}
         />
       </ReactFlowProvider>
     </div>

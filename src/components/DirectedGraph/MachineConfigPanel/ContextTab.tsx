@@ -1,5 +1,5 @@
 import {
-  Button, Collapse, Input, Popconfirm, Space, Switch,
+  Button, Collapse, Input, Popconfirm, Space, Switch, Tag,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { LockFilled, UnlockOutlined } from '@ant-design/icons';
@@ -7,11 +7,12 @@ import { LockFilled, UnlockOutlined } from '@ant-design/icons';
 import { ICheckPoint } from '../../../types';
 
 const ContextTab = ({
-  selectedNode = {}, onChange, children,
+  selectedNode = {}, onChange, children, editable,
 } : {
   selectedNode?: any;
   onChange: (changedData:ICheckPoint) => void;
   children: any;
+  editable?: boolean;
 }) => {
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
   return (
@@ -34,6 +35,7 @@ const ContextTab = ({
             newNode.locked = newLocked;
             onChange(newNode);
           }}
+          disabled={!editable}
         />
       </Space.Compact>
       <Space direction="vertical" size="small" className="w-full">
@@ -47,6 +49,7 @@ const ContextTab = ({
               newNode.locked = newLocked;
               onChange(newNode);
             }}
+            disabled={!editable}
           />
         </Space>
         <TextArea
@@ -62,13 +65,16 @@ const ContextTab = ({
       <Space direction="horizontal" className="w-full justify-between p-2 border-slate-300 border rounded">
         <Space direction="horizontal">
           <span>
-            Change this checkpoint to end node
+            Change this checkpoint to
+            <Tag className="ml-2" color={selectedNode?.isEnd ? 'red' : 'blue'}>
+              {selectedNode?.isEnd ? 'votable node' : ' end node'}
+            </Tag>
           </span>
           {selectedNode?.isEnd ?
           (
             <Switch
               checked={selectedNode?.isEnd}
-              disabled={locked.isEnd}
+              disabled={!editable}
               onChange={(isEnd) => {
                 onChange({
                   isEnd,
@@ -86,10 +92,11 @@ const ContextTab = ({
                   isEnd: !selectedNode?.isEnd,
                 });
               }}
+              disabled={locked.isEnd || !editable}
             >
               <Switch
                 checked={selectedNode?.isEnd}
-                disabled={locked.isEnd}
+                disabled={locked.isEnd || !editable}
               />
             </Popconfirm>
           )
@@ -103,6 +110,7 @@ const ContextTab = ({
             newNode.locked = newLocked;
             onChange(newNode);
           }}
+          disabled={!editable}
         />
       </Space>
       {!selectedNode.isEnd ?

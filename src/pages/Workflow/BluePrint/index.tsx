@@ -6,7 +6,7 @@ import { queryWeb2Integration, queryWorkflow } from '@utils/data';
 import { createIdString, extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import Meta from 'antd/es/card/Meta';
 import {
-  Avatar, Card, Modal, Switch, Input as AntdInput, Button,
+  Avatar, Card, Modal, Switch, Input as AntdInput, Button, Space,
 } from 'antd';
 import {
   finishLoading, setWorkflows, startLoading, initialize, setWeb2Integrations,
@@ -59,6 +59,7 @@ const BluePrint = () => {
     workflow_version: [],
   });
   const [web2IntegrationsState, setWeb2IntegrationsState] = useState(web2Integrations);
+  const [editable, setEditable] = useState(true);
   const extractWorkflowFromList = (list:any) => {
     list.forEach((d:any) => {
       const intWorkflowId = workflowId ? parseInt(workflowId, 10) : -1;
@@ -198,6 +199,13 @@ const BluePrint = () => {
               >
                 Save
               </Button>
+              <Space direction="horizontal" size="small">
+                <Switch
+                  checked={editable}
+                  onChange={(checked) => { setEditable(checked); }}
+                />
+                {editable ? 'Workflow' : 'Mission'}
+              </Space>
             </>
           ) : null}
           <Button
@@ -237,6 +245,7 @@ const BluePrint = () => {
               />
             </Modal>
             {renderVoteMachineConfigPanel({
+                editable,
                 web2Integrations: web2IntegrationsState,
                 versionData,
                 selectedNodeId,
@@ -311,6 +320,7 @@ const BluePrint = () => {
               },
             )}
             <DirectedGraph
+              editable={editable}
               data={versionData}
               selectedNodeId={selectedNodeId}
               onNodeChanged={(changedNodes) => {

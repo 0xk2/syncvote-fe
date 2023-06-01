@@ -2,6 +2,7 @@ import { PlusOutlined, TwitterOutlined } from '@ant-design/icons';
 import {
   Button, Input, Space, Tag,
 } from 'antd';
+import Paragraph from 'antd/es/typography/Paragraph';
 import { useState } from 'react';
 
 const getName = () => 'twitter';
@@ -48,18 +49,33 @@ const Add = ({
   );
 };
 
-const Display = (data: any) => {
+const Display = ({
+  data, onChange,
+}:{
+  data: any,
+  onChange: (data:any) => void,
+}) => {
   const {
     username, tweet, allNodes, triggerAt,
   } = data;
   const title = triggerAt === 'this' ? 'this' : allNodes.find((node:any) => node.id === triggerAt).title;
   return (
-    <Space direction="vertical" size="small">
-      <Space direction="horizontal" size="middle">
+    <Space direction="vertical" size="small" className="w-full">
+      <Space direction="horizontal" size="middle" className="w-full flex items-center">
         <Tag>
           {username}
         </Tag>
-        {tweet}
+        <Paragraph
+          className="w-full"
+          style={{ marginBottom: '0px' }}
+          editable={{
+            onChange: (val:string) => {
+              onChange({ ...data, tweet: val });
+            },
+          }}
+        >
+          {tweet}
+        </Paragraph>
       </Space>
       <div>
         <Tag className="mr-2">Trigger at</Tag>

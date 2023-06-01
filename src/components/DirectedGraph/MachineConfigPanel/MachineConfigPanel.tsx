@@ -7,13 +7,14 @@ import RulesTab from './RulesTab';
 import TriggerTab from './TriggerTab';
 
 const MachineConfigPanel = ({
-  children, selectedNode, onChange, web2Integrations, allNodes,
+  children, selectedNode, onChange, web2Integrations, allNodes, editable = false,
 }:{
   children: any,
   selectedNode: any,
   onChange: (changedData:ICheckPoint) => void,
   web2Integrations: any[],
   allNodes: any[],
+  editable?: boolean,
 }) => {
   const items = [
     {
@@ -23,6 +24,7 @@ const MachineConfigPanel = ({
         <ContextTab
           selectedNode={selectedNode}
           onChange={onChange}
+          editable={editable}
         >
           {children}
         </ContextTab>
@@ -34,6 +36,7 @@ const MachineConfigPanel = ({
       children: <RulesTab
         selectedNode={selectedNode}
         onChange={onChange}
+        editable={editable}
       />,
       disabled: selectedNode?.isEnd,
     },
@@ -47,6 +50,7 @@ const MachineConfigPanel = ({
         children={selectedNode?.children}
         selectedNode={selectedNode}
         allNodes={allNodes}
+        editable={editable}
       />,
     },
   ];

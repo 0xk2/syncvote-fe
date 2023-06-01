@@ -1,5 +1,6 @@
 import {
-  CarryOutOutlined, DeleteOutlined, NodeIndexOutlined, PlusOutlined,
+  ArrowRightOutlined,
+  DeleteOutlined, NodeExpandOutlined, PlusOutlined,
 } from '@ant-design/icons';
 import {
   Button, Drawer, Input, Select, Space, Tag,
@@ -40,6 +41,7 @@ const ConfigPanel = ({
     next: '',
     fallback: '',
   }, allNodes,
+  editable = false,
 }: IVoteMachineConfigProps) => {
   // TODO: config `upTo`
   const {
@@ -73,11 +75,11 @@ const ConfigPanel = ({
     return (
       !val ?
         (
-          <Space direction="horizontal" className="flex items-center" size="small">
+          <Space direction="horizontal" className="flex items-center justify-between" size="small">
             <div>
               {type === 'next' ? 'If we found winner then ' : 'If voting is over and we can not find winners, then ' }
             </div>
-            <NodeIndexOutlined />
+            <ArrowRightOutlined />
             <Select
               style={{ width: '200px' }}
               options={possibleOptions}
@@ -94,10 +96,10 @@ const ConfigPanel = ({
         )
         :
         (
-          <Space direction="horizontal" size="small">
+          <Space direction="horizontal" size="small" className="flex items-center justify-between">
             <Button
               type="link"
-              className="flex items-center text-red-500"
+              className="flex items-center text-red-500 justify-between"
               icon={<DeleteOutlined />}
               onClick={() => {
                 const newData:any = structuredClone(data);
@@ -110,9 +112,10 @@ const ConfigPanel = ({
                   children: newChildren,
                 });
               }}
+              disabled={!editable}
             />
             {type === 'next' ? 'Winner found' : 'No winner found'}
-            <NodeIndexOutlined />
+            <ArrowRightOutlined />
             {type === 'next' ? <Tag>{nextTitle}</Tag> : <Tag>{fallbackTitle}</Tag>}
           </Space>
         )
@@ -133,7 +136,7 @@ const ConfigPanel = ({
             className="w-full"
             prefix={(
               <div className="text-slate-300">
-                <CarryOutOutlined className="inline-flex items-center pr-2" />
+                <ArrowRightOutlined className="inline-flex items-center pr-2" />
               </div>
             )}
             value={maxStr}
@@ -150,6 +153,7 @@ const ConfigPanel = ({
                 },
               });
             }}
+            disabled={!editable}
           />
         </Space.Compact>
       </Space>
@@ -166,10 +170,11 @@ const ConfigPanel = ({
             className="w-full"
             prefix={(
               <div className="text-slate-300">
-                <CarryOutOutlined className="inline-flex items-center pr-2" />
+                <ArrowRightOutlined className="inline-flex items-center pr-2" />
               </div>
             )}
             value={upTo}
+            disabled={!editable}
             onChange={(e) => {
               onChange({
                 data: {
@@ -177,8 +182,9 @@ const ConfigPanel = ({
                   upTo: parseInt(e.target.value, 10),
                 },
               });
-              // TODO: enforce this in Mission, not in workflow
-              // if (e.target.value !== '' && !Number.isNaN(parseInt(e.target.value, 10))
+              // TODO: check in publish; but not sure if data is taken from previous checkpoint
+              // if (editable === false && e.target.value !== ''
+              //   && !Number.isNaN(parseInt(e.target.value, 10))
               //   && parseInt(e.target.value, 10) > 0 && parseInt(e.target.value, 10) < lOptions) {
               //   onChange({
               //     data: {
@@ -186,6 +192,11 @@ const ConfigPanel = ({
               //     },
               //   });
               // } else {
+              //   Modal.error({
+              //     title: 'Invalid value',
+              //     content: `Max number of choices should smaller
+              //     than number of options and greater than 0`,
+              //   });
               //   onChange({
               //     data: {
               //       upTo: 0,
@@ -202,9 +213,9 @@ const ConfigPanel = ({
           <Space direction="vertical" size="small" className="w-full">
             <div>List of options</div>
             {options?.map((option:any, index:any) => (
-              <div key={option.title}>
+              <Space direction="horizontal" key={option.title} className="flex items-center">
                 <Button
-                  className="mr-2"
+                  className="mr-2 flex-inline items-center text-center text-red-500"
                   icon={<DeleteOutlined />}
                   onClick={() => {
                     onChange({
@@ -218,8 +229,11 @@ const ConfigPanel = ({
                     });
                   }}
                 />
-                {`${option.title} , ${option.description}`}
-              </div>
+                <Space direction="vertical" size="small">
+                  <div className="text-slate-700">{option.title}</div>
+                  <div className="text-xs">{option.description}</div>
+                </Space>
+              </Space>
             ))}
           </Space>
         )
@@ -304,7 +318,12 @@ const getLabel = (props : IVoteMachineGetLabelProps) => {
   const { source, target } = props;
   return source?.data.next === target?.id ? (<span>Next</span>) : (<span>Fallback</span>);
 };
-// label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
+
+const getIcon = () => {
+  return (
+    <NodeExpandOutlined />
+  );
+};
 
 const VoteMachine : IVoteMachine = {
   ConfigPanel,
@@ -313,6 +332,7 @@ const VoteMachine : IVoteMachine = {
   deleteChildNode,
   getLabel,
   getType,
+  getIcon,
 };
 
 export default VoteMachine;

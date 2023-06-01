@@ -6,10 +6,12 @@ import { IVoteMachine } from '../../types';
 
 const renderVoteMachineConfigPanel = ({
   versionData, selectedNodeId, onChange, onNew, onDelete, onClose, web2Integrations,
+  editable = false,
 }: {
   versionData: any, selectedNodeId:string, onChange: (data:any) => void, onNew: (data:any) => void,
   onDelete: (data:any) => void, onClose: () => void,
   web2Integrations: any[],
+  editable?: boolean,
 }) => {
   const allVoteMachines = getAllVoteMachines();
   const selectedNode = versionData.checkpoints.find((chk:any) => chk.id === selectedNodeId);
@@ -19,6 +21,7 @@ const renderVoteMachineConfigPanel = ({
       onChange={onChange}
       web2Integrations={web2Integrations}
       allNodes={versionData.checkpoints}
+      editable={editable}
     >
       <Space direction="vertical" className="w-full">
         <div>Choose a vote machine</div>
@@ -49,8 +52,10 @@ const renderVoteMachineConfigPanel = ({
         onChange={onChange}
         web2Integrations={web2Integrations}
         allNodes={versionData.checkpoints}
+        editable={editable}
       >
         <ConfigPanel
+          editable={editable}
           currentNodeId={selectedNodeId}
           onChange={onChange}
           children={selectedNode.children}
@@ -84,6 +89,7 @@ const renderVoteMachineConfigPanel = ({
               onChange(newVersionData);
               onDelete(selectedNodeId);
             }}
+            disabled={!editable}
           >
             Delete
           </Button>

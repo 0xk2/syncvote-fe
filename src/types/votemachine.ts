@@ -1,4 +1,5 @@
 export interface IVoteMachineConfigProps {
+  editable: boolean,
   currentNodeId?: string,
   allNodes: any[],
   children: string[],
@@ -32,4 +33,5 @@ export interface IVoteMachine {
   getType: () => string,
   deleteChildNode: (data: any, children:string[], childId:string) => void,
   getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element,
+  getIcon: () => JSX.Element,
 }

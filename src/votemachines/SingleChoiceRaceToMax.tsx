@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   BranchesOutlined, CarryOutOutlined, DeleteOutlined, NodeIndexOutlined,
-  PlusCircleOutlined, TwitterOutlined,
+  PlusCircleOutlined, ShareAltOutlined, TwitterOutlined,
 } from '@ant-design/icons';
 import {
   Input, Select, Space, Button, Tag, Drawer,
@@ -40,13 +40,19 @@ const deleteChildNode = (data: IData, children:string[], childId:string) => {
   result.splice(index, 1);
   return { ...data, options: result };
 };
-
+/**
+ *
+ * @param IVoteMachineConfigProps
+ * note: editable === true -> then locked item is disabled too
+ * @returns ConfigPanel:JSX.Element
+ */
 const ConfigPanel = ({
   currentNodeId = '', votingPowerProvider = '', whitelist = [], //eslint-disable-line
   data = {
     max: 0,
     options: [],
   },
+  editable,
   onChange = (data:ICheckPoint) => {}, children = [], allNodes = [], //eslint-disable-line
 }:IVoteMachineConfigProps) => {
   const { max, options } = data;
@@ -84,6 +90,7 @@ const ConfigPanel = ({
               </div>
             )}
             value={maxStr}
+            disabled={!editable}
             onChange={(e) => {
               const str = e.target.value;
               let tMax = 0;
@@ -144,9 +151,9 @@ const ConfigPanel = ({
                   }}
                 />
                 <Button
-                  className="mr-2 flex items-center justify-center"
+                  className="mr-2 flex items-center justify-center disabled:text-slate-300 text-red-600"
                   type="default"
-                  icon={<DeleteOutlined className="text-red-600" />}
+                  icon={<DeleteOutlined />}
                   onClick={() => {
                     onChange({
                       data: {
@@ -161,6 +168,7 @@ const ConfigPanel = ({
                       ],
                     });
                   }}
+                  disabled={!editable}
                 />
               </Space.Compact>
             );
@@ -173,6 +181,7 @@ const ConfigPanel = ({
         type="default"
         className="w-full"
         onClick={() => setShowNewOptionDrawer(true)}
+        disabled={!editable}
       >
         Add New Option
       </Button>
@@ -274,6 +283,12 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
 };
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
+const getIcon = () => {
+  return (
+    <ShareAltOutlined />
+  );
+};
+
 const VoteMachine : IVoteMachine = {
   ConfigPanel,
   getProgramAddress,
@@ -281,6 +296,7 @@ const VoteMachine : IVoteMachine = {
   deleteChildNode,
   getLabel,
   getType,
+  getIcon,
 };
 
 export default VoteMachine;

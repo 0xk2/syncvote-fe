@@ -31,7 +31,7 @@ const getProvider = (provider:string) => {
 };
 
 const TriggerTab = ({
-  web2Integrations, triggers, onChange, children, selectedNode, allNodes,
+  web2Integrations, triggers, onChange, children, selectedNode, allNodes, editable = false,
 }:{
   web2Integrations: IIntegration[],
   triggers: ITrigger[],
@@ -39,6 +39,7 @@ const TriggerTab = ({
   children: any[],
   selectedNode: any,
   allNodes: any[],
+  editable?: boolean,
 }) => {
   const [showAddTriggerDrawer, setShowAddTriggerDrawer] = useState(false);
   const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
@@ -102,7 +103,8 @@ const TriggerTab = ({
                   key={trigger.id || Math.random()}
                   extra={(
                     <Space direction="horizontal" size="middle">
-                      <DeleteOutlined
+                      <Button
+                        icon={<DeleteOutlined />}
                         className="text-red-500"
                         onClick={() => {
                           const tmpSelectedNode = structuredClone(selectedNode);
@@ -113,13 +115,24 @@ const TriggerTab = ({
                             triggers: tmpTriggers,
                           });
                         }}
+                        disabled={!editable}
                       />
                     </Space>
                   )}
                 >
                   <div>
                     {display({
-                      ...trigger, allNodes,
+                      data: {
+                        ...trigger, allNodes,
+                      },
+                      onChange: (data) => {
+                        const newTriggers = [...triggers];
+                        newTriggers[index] = data;
+                        onChange({
+                          ...selectedNode,
+                          triggers: newTriggers,
+                        });
+                      },
                     })}
                   </div>
                 </Collapse.Panel>
@@ -133,6 +146,7 @@ const TriggerTab = ({
         onClick={() => {
           setShowAddTriggerDrawer(true);
         }}
+        disabled={!editable}
       >
         Add Trigger
       </Button>
