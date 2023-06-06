@@ -83,10 +83,12 @@ const renderVoteMachineConfigPanel = ({
               let data = structuredClone(selectedNode.data);
               const newVersionData = structuredClone(versionData);
               const vm = getVoteMachine(selectedNode.vote_machine_type);
-              data = vm.deleteChildNode(
-                data, selectedNode.children, selectedNodeId,
-              );
-              newVersionData.data = data;
+              if (vm) {
+                data = vm.deleteChildNode(
+                  data, selectedNode.children, selectedNodeId,
+                );
+                newVersionData.data = data;
+              }
               onChange(newVersionData);
               onDelete(selectedNodeId);
             }}

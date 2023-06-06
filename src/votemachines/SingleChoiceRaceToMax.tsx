@@ -32,8 +32,8 @@ const getType = () => {
 };
 
 const deleteChildNode = (data: IData, children:string[], childId:string) => {
-  const index = children.indexOf(childId);
-  const result = data.options.length === 0 ? [] : [...data.options];
+  const index = children ? children.indexOf(childId) : -1;
+  const result = data.options ? [...data.options] : [];
   if (index === -1) {
     return result;
   }
