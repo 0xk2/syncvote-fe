@@ -44,6 +44,9 @@ const Flow = ({
       onViewPortChange(viewport);
     }, []),
   });
+  const proOptions = {
+    hideAttribution: true,
+  };
   return (
     <ReactFlow
       nodes={nodes}
@@ -53,6 +56,7 @@ const Flow = ({
       onNodesChange={onNodeChanged}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
+      proOptions={proOptions}
       fitView
     >
       <Controls />

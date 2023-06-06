@@ -10,7 +10,7 @@ const Meta = ({
   setCurrentMission: (data:any) => void;
 }) => {
   return (
-    <Space direction="vertical" size="large">
+    <Space direction="vertical" size="large" className="w-full">
       <div>
         <Icon
           editable={currentMission.status !== 'PUBLISHED'}

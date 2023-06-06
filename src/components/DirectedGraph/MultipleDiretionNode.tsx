@@ -1,6 +1,23 @@
-import { TwitterOutlined } from '@ant-design/icons';
+import { SettingOutlined, TwitterOutlined } from '@ant-design/icons';
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
+
+// TODO: how to register getIcon in 1 place?
+const getIcon = (provider:string, id: number | undefined) => {
+  let rs = <></>;
+  switch (provider) {
+    case 'twitter':
+      rs = <TwitterOutlined key={id || Math.random()} />;
+      break;
+    case 'custom':
+      rs = <SettingOutlined key={id || Math.random()} />;
+      break;
+    default:
+      rs = <span key={id || Math.random()}>{provider}</span>;
+      break;
+  }
+  return rs;
+};
 
 const Node = memo(({ data, isConnectable = true, id }: {
   data: any,
@@ -71,11 +88,11 @@ const Node = memo(({ data, isConnectable = true, id }: {
         style={data.style}
       >
         <div>{ data.label ? data.label : id }</div>
-        <div className="text-xs flex justify-center">
+        <div className="text-xs flex justify-center gap-0.5">
           {
           data.triggers && data.triggers.length > 0 ?
             data.triggers.map((trigger:any) => {
-              const icon = trigger.provider === 'twitter' ? <TwitterOutlined key={trigger.id || Math.random()} /> : <span key={trigger.id || Math.random()}>{trigger.provider}</span>;
+              const icon = getIcon(trigger.provider, trigger.id);
               if (trigger.triggerAt === 'this') {
                 return (
                   icon

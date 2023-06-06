@@ -14,6 +14,7 @@ import { IMission } from '../../../types/mission';
 import { create } from '../../../utils/data/dash';
 
 import MissionData from './fragments/MissionData';
+import MissionMeta from './fragments/MissionMeta';
 
 const EditMission = () => {
   const {
@@ -121,6 +122,9 @@ const EditMission = () => {
   };
   return (
     <Space direction="vertical" className="w-full">
+      <Space className="container m-auto py-4">
+        <MissionMeta currentMission={currentMission} setCurrentMission={setCurrentMission} />
+      </Space>
       <MissionData
         currentMission={currentMission}
         web2IntegrationsState={web2IntegrationsState}

@@ -6,6 +6,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Twitter from '../Enforcer/Twitter';
+import Fake from '../Enforcer/Fake';
 
 interface ITrigger {
   id: string,
@@ -22,6 +23,11 @@ const getProvider = (provider:string) => {
         Add: Twitter.Add,
         Display: Twitter.Display,
       };
+      case Fake.getName():
+        return {
+          Add: Fake.Add,
+          Display: Fake.Display,
+        };
     default:
       return {
         Add: () => (<></>),
