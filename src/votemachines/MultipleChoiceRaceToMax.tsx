@@ -91,6 +91,7 @@ const ConfigPanel = ({
                   children: [...children, value],
                 });
               }}
+              disabled={!editable}
             />
           </Space>
         )

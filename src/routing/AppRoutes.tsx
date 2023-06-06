@@ -42,7 +42,7 @@ import {
 } from '@pages/Organization';
 import CreatorLogin from '@pages/Authentication/creator';
 import BluePrint from '@pages/Workflow/BluePrint';
-import NewMission from '@pages/MultiProposal/Mission/NewMission';
+import { NewMission, EditMission } from '@pages/MultiProposal/Mission';
 
 const AppRoutes = () => (
   <BrowserRouter basename={PAGE_ROUTES.ROOT}>
@@ -63,8 +63,14 @@ const AppRoutes = () => (
 
         <Route path={PAGE_ROUTES.INITIATIVE.ROOT} element={<Initiative />}>
           <Route path={`:orgIdString/${PAGE_ROUTES.INITIATIVE.CHOOSE_WORKFLOW}`} element={<BuildInitiative />} />
-          <Route path={`:orgIdString/:workflowIdString/:versionIdString/${PAGE_ROUTES.INITIATIVE.MISSION}`} element={<NewMission />} />
-          <Route path={`:orgIdString/${PAGE_ROUTES.INITIATIVE.MISSION}/:missionIdString`} element={<NewMission />} />
+          <Route
+            path={`:orgIdString/${PAGE_ROUTES.INITIATIVE.MISSION}/:missionIdString`}
+            element={<EditMission />}
+          />
+          <Route
+            path={`:orgIdString/:workflowIdString/:versionIdString/${PAGE_ROUTES.INITIATIVE.MISSION}`}
+            element={<NewMission />}
+          />
           <Route path={PAGE_ROUTES.INITIATIVE.REVIEW_CHECKPOINT} element={<ReviewCheckPoint />} />
           <Route path={PAGE_ROUTES.INITIATIVE.ADD_INITIATIVE} element={<AddNewInitiative />} />
           <Route

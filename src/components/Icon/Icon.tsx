@@ -34,7 +34,7 @@ const ChooseImageModal = ({
               }}
             >
               <img
-                src={supabase.storage.from('preset_images').getPublicUrl(`icon/${icon}`).data.publicUrl}
+                src={getImageUrl({ filePath: icon, isPreset: true, type: 'icon' })}
                 alt="icon"
                 // className="w-[16px] h-[16px]"
               />

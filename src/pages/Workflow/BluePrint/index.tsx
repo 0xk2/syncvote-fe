@@ -299,13 +299,13 @@ const BluePrint = () => {
                   } else {
                     const newData = structuredClone(versionData);
                     const index = newData.checkpoints.findIndex((v:any) => v.id === id);
-                    newData.checkpoints?.forEach((_node:any, index: number) => {
+                    newData.checkpoints?.forEach((_node:any, cindex: number) => {
                       if (_node.children?.includes(id)) {
                         const newChkpData = getVoteMachine(_node.vote_machine_type)
                         ?.deleteChildNode(
                           _node.data, _node.children, id,
                         ) || _node.data;
-                        newData.checkpoints[index].data = newChkpData;
+                        newData.checkpoints[cindex].data = newChkpData;
                         if (_node.children) {
                           _node.children.splice(_node.children.indexOf(id));
                         }

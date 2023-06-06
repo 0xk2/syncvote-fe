@@ -5,6 +5,7 @@ import { getAllVoteMachines, getVoteMachine } from './voteMachine';
 import { IVoteMachine } from '../../types';
 
 const renderVoteMachineConfigPanel = ({
+  // TODO: change versionData to a better name
   versionData, selectedNodeId, onChange, onNew, onDelete, onClose, web2Integrations,
   editable = false,
 }: {
@@ -14,7 +15,7 @@ const renderVoteMachineConfigPanel = ({
   editable?: boolean,
 }) => {
   const allVoteMachines = getAllVoteMachines();
-  const selectedNode = versionData.checkpoints.find((chk:any) => chk.id === selectedNodeId);
+  const selectedNode = versionData.checkpoints?.find((chk:any) => chk.id === selectedNodeId);
   let configPanel = (
     <MachineConfigPanel
       selectedNode={selectedNode}

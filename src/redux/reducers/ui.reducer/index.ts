@@ -66,6 +66,28 @@ const globalUISlice = createSlice({
         state.workflows[index] = action.payload;
       }
     },
+    deleteWorkflowVersion: (state, action) => {
+      const index = state.workflows.findIndex((w:any) => w.workflowId === action.payload.id);
+      if (index !== -1) {
+        const vIndex = state.workflows[index].workflow_version.findIndex((v:any) => v.id === action.payload.versionId);
+        if (vIndex !== -1) {
+          state.workflows[index].workflow_version.splice(vIndex, 1);
+        }
+      }
+    },
+    changeWorkflowVersion: (state, action) => {
+      const index = state.workflows.findIndex((w:any) => w.workflowId === action.payload.id);
+      if (index !== -1) {
+        if (action.payload.verionId) {
+          const vIndex = state.workflows[index].workflow_version.findIndex((v:any) => v.id === action.payload.versionId);
+          if (vIndex !== -1) {
+            state.workflows[index].workflow_version[vIndex] = action.payload.versionData;
+          }
+        } else {
+          state.workflows[index].workflow_version.push(action.payload.versionData);
+        }
+      }
+    },
     setMissions: (state, action) => {
       state.missions = action.payload;
     },
@@ -75,6 +97,12 @@ const globalUISlice = createSlice({
         state.missions.push(action.payload);
       } else {
         state.missions[index] = action.payload;
+      }
+    },
+    deleteMission: (state, action) => {
+      const index = state.missions.findIndex((m:any) => m.id === action.payload.id);
+      if (index !== -1) {
+        state.missions.splice(index, 1);
       }
     },
     setTemplates: (state, action) => {
@@ -132,6 +160,7 @@ export const {
   changeWorkflow,
   setMissions,
   changeMission,
+  deleteMission,
   setTemplates,
   changeTemplate,
   setWeb2Integrations,

@@ -66,7 +66,7 @@ const Flow = ({
     </ReactFlow>
   );
 };
-
+// TODO: expose a function for manually trigger fitview
 const DirectedGraph = ({
   data, onNodeClick = () => {},
   selectedNodeId,

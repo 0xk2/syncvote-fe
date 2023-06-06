@@ -14,17 +14,11 @@ export const create = async ({
   onError?: (error:any) => void;
   dispatch: any;
 }) => {
-  let toSend = {
-    title: '', desc: '',
+  const toSend = {
+    ...json,
+    name: title,
+    description: desc,
   };
-  try {
-    toSend = JSON.parse(json);
-  } catch (e) {
-    onError(e);
-    return;
-  }
-  toSend.title = title;
-  toSend.desc = desc;
   dispatch(startLoading({}));
   const response = await fetch(`${BASE_URL}/create`, {
     method: 'POST',
@@ -39,7 +33,7 @@ export const create = async ({
     onSuccess(data);
   } else {
     const data = await response.json();
-    onSuccess(data);
+    onError(data);
   }
 };
 

@@ -1,6 +1,41 @@
 import { supabase } from '../supabaseClient';
-import { finishLoading, startLoading } from '../../redux/reducers/ui.reducer';
+import {
+  finishLoading, startLoading, deleteMission as reduxDeleteMission, addOrg,
+} from '../../redux/reducers/ui.reducer';
+import { queryWeb2Integration as qw2i, deleteWeb2Integration as dw2i } from './integration';
 
+export const newOrg = async ({
+  orgInfo, onSuccess, onError = (error) => {
+    console.error(error); // eslint-disable-line
+  }, dispatch,
+}: {
+  orgInfo: {
+    title: string;
+    desc: string;
+    icon_url: string;
+    org_size: string;
+    org_type: string;
+    preset_banner_url: string;
+  };
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  const { data, error } = await supabase.from('org')
+    .insert(orgInfo).select();
+  if (error) {
+    onError(error);
+  } else {
+    const info = structuredClone(orgInfo);
+    dispatch(addOrg({
+      id: data[0].id,
+      role: 'ADMIN',
+      ...info,
+    }));
+    onSuccess(data);
+  }
+};
+// TODO: should update redux state in here
 export const queryWorkflow = async ({
   orgId, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -28,6 +63,7 @@ export const queryWorkflow = async ({
     onError(error);
   }
 };
+// TODO: should update redux state in here
 export const queryMission = async ({
   orgId, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -40,7 +76,9 @@ export const queryMission = async ({
   filter?: any;
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from('mission').select('*').eq('owner_org_id', orgId);
+  const { data, error } = await supabase.from('mission')
+    .select('*, workflow_version(id, workflow(owner_org_id))')
+    .eq('workflow_version.workflow.owner_org_id', orgId);
   dispatch(finishLoading({}));
   if (data) {
     onLoad(data);
@@ -48,6 +86,7 @@ export const queryMission = async ({
     onError(error);
   }
 };
+// TODO: should update redux state in here
 export const queryAMission = async ({
   missionId, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -74,6 +113,7 @@ export const queryAMission = async ({
     onError(error);
   }
 };
+// TODO: should update redux state in here
 export const upsertAMission = async ({
   mission, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -85,7 +125,7 @@ export const upsertAMission = async ({
   dispatch: any;
 }) => {
   dispatch(startLoading({}));
-  const newMission = { ...mission };
+  const newMission = structuredClone(mission);
   if (newMission.id < 0) { // invalid id, probably a new mission
     delete newMission.id;
   }
@@ -96,6 +136,9 @@ export const upsertAMission = async ({
   if (newMission.banner_url?.indexOf('preset:') === 0) {
     newMission.preset_banner_url = newMission.banner_url.replace('preset:', '');
     newMission.banner_url = '';
+  }
+  if (newMission.workflow_version) {
+    delete newMission.workflow_version;
   }
   const { data, error } = await supabase.from('mission').upsert(newMission).select();
   dispatch(finishLoading({}));
@@ -112,6 +155,7 @@ export const upsertAMission = async ({
     onError(error);
   }
 };
+// TODO: should update redux state in here
 export const upsertAnOrg = async ({
   org, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -156,50 +200,30 @@ export const upsertAnOrg = async ({
     onError(error);
   }
 };
-export const queryWeb2Integration = async ({
-  orgId, onLoad, onError = (error) => {
-    console.error(error); // eslint-disable-line
-  }, dispatch,
-}: {
-  orgId: number;
-  onLoad: (data: any) => void;
-  onError?: (data: any) => void;
-  dispatch: any;
-}) => {
-  dispatch(startLoading({}));
-  const { data, error } = await supabase.from('web2_key').select('*').eq('org_id', orgId).order('created_at', { ascending: false });
-  dispatch(finishLoading({}));
-  if (data) {
-    const newData:any[] = [];
-    data.forEach((d) => {
-      const newd = structuredClone(d);
-      newd.icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
-      newd.banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
-      delete newd.preset_icon_url;
-      delete newd.preset_banner_url;
-      newData.push(newd);
-    });
-    onLoad(newData);
-  } else if (error) {
-    onError(error);
-  }
-};
-export const deleteWeb2Integration = async ({
+
+// TODO: should update redux state in here
+export const deleteMission = async ({
   id, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
   }, dispatch,
 }: {
-  id: string;
+  id: number;
   onLoad: (data: any) => void;
   onError?: (data: any) => void;
   dispatch: any;
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from('web2_key').delete().eq('id', id);
+  const { data, error } = await supabase.from('mission').delete().eq('id', id);
   dispatch(finishLoading({}));
   if (!error) {
+    dispatch(reduxDeleteMission({
+      id,
+    }));
     onLoad(data);
   } else {
     onError(error);
   }
 };
+
+export const queryWeb2Integration = qw2i;
+export const deleteWeb2Integration = dw2i;

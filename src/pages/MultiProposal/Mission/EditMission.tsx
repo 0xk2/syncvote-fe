@@ -1,0 +1,141 @@
+import { Modal, Space } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
+import PAGE_ROUTES from '@utils/constants/pageRoutes';
+import {
+  upsertAMission, deleteMission, queryAMission, queryWeb2Integration,
+} from '@utils/data';
+import { extractIdFromIdString } from '@utils/helpers';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  initialize, setMissions, setWeb2Integrations,
+} from '@redux/reducers/ui.reducer'; // TODO: should it be setMissions???
+import { IMission } from '../../../types/mission';
+import { create } from '../../../utils/data/dash';
+
+import MissionData from './fragments/MissionData';
+
+const EditMission = () => {
+  const {
+    missionIdString, orgIdString,
+  } = useParams();
+  const { initialized, missions, web2Integrations } = useSelector((state: any) => state.ui);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const missionId = extractIdFromIdString(missionIdString);
+  const orgId = extractIdFromIdString(orgIdString);
+  const [currentMission, setCurrentMission] = useState<IMission>(
+    missions.find((m: any) => m.id === missionId) || {
+    id: -1,
+    title: '',
+    desc: '',
+    data: '{checkpoints:[]}',
+    status: 'DRAFT',
+  });
+  const [web2IntegrationsState, setWeb2IntegrationsState] = useState(web2Integrations);
+  useEffect(() => {
+    if (missionIdString && initialized === false) {
+      queryAMission({
+        missionId,
+        onLoad: (data) => {
+          setCurrentMission(data[0]);
+          dispatch(initialize({}));
+          dispatch(setMissions(data));
+        },
+        dispatch,
+      });
+      queryWeb2Integration({
+        orgId,
+        onLoad: (data) => {
+          dispatch(setWeb2Integrations(data));
+          dispatch(initialize({}));
+          setWeb2IntegrationsState(data);
+        },
+        dispatch,
+      });
+    }
+  }, [missions, initialized]);
+  const onSave = async (newMission:any) => {
+    await upsertAMission({
+      mission: newMission,
+      onLoad: (data) => {
+        setCurrentMission(data[0]);
+        Modal.success({
+          title: 'Success',
+          content: 'Mission saved successfully',
+        });
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error.message,
+        });
+      },
+      dispatch,
+    });
+  };
+  const onDelete = () => {
+    deleteMission({
+      id: currentMission.id || -1,
+      onLoad: () => {
+        navigate(`/${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
+        Modal.success({
+          title: 'Success',
+          content: 'Mission deleted successfully',
+        });
+      },
+      dispatch,
+    });
+  };
+  const onPublish = () => {
+    create({
+      json: currentMission.data,
+      title: currentMission.title || '',
+      desc: currentMission.desc || '',
+      dispatch,
+      onSuccess: (blockchainResp:any) => {
+        const newMission = {
+          ...currentMission,
+          status: 'PUBLISHED',
+          solana_address: blockchainResp.id,
+        };
+        setCurrentMission(newMission);
+        onSave(newMission);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error.message,
+        });
+      },
+    });
+  };
+  const onUnPublish = () => {
+    const newMission = {
+      ...currentMission,
+      status: 'DRAFT',
+      solana_address: '',
+    };
+    setCurrentMission(newMission);
+    onSave(newMission);
+  };
+  return (
+    <Space direction="vertical" className="w-full">
+      <MissionData
+        currentMission={currentMission}
+        web2IntegrationsState={web2IntegrationsState}
+        setCurrentMissionData={(data: any) => {
+          setCurrentMission({
+            ...currentMission,
+            data,
+          });
+        }}
+        onPublish={onPublish}
+        onDelete={onDelete}
+        onUnPublish={onUnPublish}
+      />
+    </Space>
+  );
+};
+
+export default EditMission;
