@@ -364,6 +364,7 @@ const BluePrint = () => {
                 newData.checkpoints.push({
                   id: newId,
                   position: centerPos,
+                  isEnd: true,
                 });
                 setVersionData(newData);
                 setSelectedNodeId(newId);

@@ -25,20 +25,21 @@ const MachineConfigPanel = ({
           selectedNode={selectedNode}
           onChange={onChange}
           editable={editable}
-        >
-          {children}
-        </ContextTab>
+        />
       ),
     },
     {
       key: '2',
       label: 'Rules and conditions',
-      children: <RulesTab
-        selectedNode={selectedNode}
-        onChange={onChange}
-        editable={editable}
-      />,
-      disabled: selectedNode?.isEnd,
+      children: (
+        <RulesTab
+          selectedNode={selectedNode}
+          onChange={onChange}
+          editable={editable}
+        >
+          {children}
+        </RulesTab>
+      ),
     },
     {
       key: '3',

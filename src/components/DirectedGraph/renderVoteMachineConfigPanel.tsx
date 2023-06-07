@@ -1,8 +1,9 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Drawer, Space } from 'antd';
+import { Button, Drawer } from 'antd';
 import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
-import { getAllVoteMachines, getVoteMachine } from './voteMachine';
+import { getVoteMachine } from './voteMachine';
 import { IVoteMachine } from '../../types';
+import ChooseVoteMachine from './MachineConfigPanel/ChooseVoteMachine';
 
 const renderVoteMachineConfigPanel = ({
   // TODO: change versionData to a better name
@@ -14,7 +15,6 @@ const renderVoteMachineConfigPanel = ({
   web2Integrations: any[],
   editable?: boolean,
 }) => {
-  const allVoteMachines = getAllVoteMachines();
   const selectedNode = versionData.checkpoints?.find((chk:any) => chk.id === selectedNodeId);
   let configPanel = (
     <MachineConfigPanel
@@ -24,23 +24,10 @@ const renderVoteMachineConfigPanel = ({
       allNodes={versionData.checkpoints}
       editable={editable}
     >
-      <Space direction="vertical" className="w-full">
-        <div>Choose a vote machine</div>
-        {Object.keys(allVoteMachines).map((type:any) => {
-          const machine = allVoteMachines[type];
-          return (
-            <div
-              className="p-4 border border-slate-300 mb-2 cursor-pointer hover:bg-slate-100 w-full"
-              onClick={() => {
-                onNew(type);
-              }}
-              key={type}
-            >
-              {machine.getName()}
-            </div>
-          );
-        })}
-      </Space>
+      <ChooseVoteMachine
+        onNew={onNew}
+        currentType={selectedNode?.vote_machine_type}
+      />
     </MachineConfigPanel>
   );
   if (selectedNode !== undefined && selectedNode.vote_machine_type !== undefined) {

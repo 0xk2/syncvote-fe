@@ -147,11 +147,13 @@ const Data = ({
             setVersionData(newData);
           }}
           onAddNewNode={() => {
+            // TODO: should I delete this function? you cannot create new node in Mission mode
             const newData = structuredClone(versionData);
             const newId = `node-${new Date().getTime()}`;
             newData.checkpoints.push({
               id: newId,
               position: centerPos,
+              isEnd: true,
             });
             setVersionData(newData);
             setSelectedNodeId(newId);

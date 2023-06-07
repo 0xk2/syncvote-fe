@@ -6,6 +6,7 @@ const rootCheckPoint: ICheckPoint = {
     x: 0,
     y: 0,
   },
+  isEnd: true,
   data: {},
 };
 const endNode: ICheckPoint = {

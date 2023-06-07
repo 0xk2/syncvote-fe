@@ -1,5 +1,5 @@
 import {
-  Button, Collapse, Input, Popconfirm, Space, Switch, Tag,
+  Button, Input, Space,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { LockFilled, UnlockOutlined } from '@ant-design/icons';
@@ -7,11 +7,10 @@ import { LockFilled, UnlockOutlined } from '@ant-design/icons';
 import { ICheckPoint } from '../../../types';
 
 const ContextTab = ({
-  selectedNode = {}, onChange, children, editable,
+  selectedNode = {}, onChange, editable,
 } : {
   selectedNode?: any;
   onChange: (changedData:ICheckPoint) => void;
-  children: any;
   editable?: boolean;
 }) => {
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
@@ -62,67 +61,6 @@ const ContextTab = ({
           disabled={locked.description}
         />
       </Space>
-      <Space direction="horizontal" className="w-full justify-between p-2 border-slate-300 border rounded">
-        <Space direction="horizontal">
-          <span>
-            Change this checkpoint to
-            <Tag className="ml-2" color={selectedNode?.isEnd ? 'red' : 'blue'}>
-              {selectedNode?.isEnd ? 'votable node' : ' end node'}
-            </Tag>
-          </span>
-          {selectedNode?.isEnd ?
-          (
-            <Switch
-              checked={selectedNode?.isEnd}
-              disabled={!editable}
-              onChange={(isEnd) => {
-                onChange({
-                  isEnd,
-                });
-              }}
-            />
-          )
-          :
-          (
-            <Popconfirm
-              title="Are you sure?"
-              description="This will delete all connection to other nodes!"
-              onConfirm={() => {
-                onChange({
-                  isEnd: !selectedNode?.isEnd,
-                });
-              }}
-              disabled={locked.isEnd || !editable}
-            >
-              <Switch
-                checked={selectedNode?.isEnd}
-                disabled={locked.isEnd || !editable}
-              />
-            </Popconfirm>
-          )
-          }
-        </Space>
-        <Button
-          icon={locked.isEnd ? <LockFilled /> : <UnlockOutlined />}
-          onClick={() => {
-            const newLocked = { ...locked, isEnd: !locked.isEnd };
-            const newNode = structuredClone(selectedNode);
-            newNode.locked = newLocked;
-            onChange(newNode);
-          }}
-          disabled={!editable}
-        />
-      </Space>
-      {!selectedNode.isEnd ?
-      (
-        <Collapse defaultActiveKey={['1']}>
-          <Collapse.Panel header="Voting Logic" key="1">
-            {children}
-          </Collapse.Panel>
-        </Collapse>
-      )
-      : null
-      }
     </Space>
   );
 };

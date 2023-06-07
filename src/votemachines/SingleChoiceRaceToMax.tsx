@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
-  BranchesOutlined, CarryOutOutlined, DeleteOutlined, MoneyCollectOutlined, NodeIndexOutlined,
+  ArrowLeftOutlined,
+  CarryOutOutlined, ClockCircleOutlined, DeleteOutlined, MoneyCollectOutlined, NodeIndexOutlined,
   PlusCircleOutlined, QuestionCircleOutlined, ShareAltOutlined, TwitterOutlined,
 } from '@ant-design/icons';
 import {
@@ -40,6 +41,77 @@ const deleteChildNode = (data: IData, children:string[], childId:string) => {
   result.splice(index, 1);
   return { ...data, options: result };
 };
+
+const Option = ({
+  index, currentNode, option, deleteOptionHandler, changeOptionHandler,
+  editable = false, possibleOptions, addAndDeleteOptionHandler,
+}:{
+  index: number;
+  currentNode: any;
+  option: string;
+  deleteOptionHandler: (index:number) => void;
+  changeOptionHandler: (value:any, index:number) => void;
+  editable?: boolean;
+  possibleOptions: any[];
+  addAndDeleteOptionHandler: (newOptionData:any, index:number) => void;
+}) => {
+  const [label, setLabel] = useState(option);
+  return (
+    <Space direction="vertical" className="w-full flex justify-between">
+      <div className="w-full flex justify-between">
+        <div className="w-6/12 flex pt-1 justify-between items-center">
+          <span className="text-gray-400">{`Option ${index + 1}`}</span>
+          <Button
+            type="link"
+            className="flex items-center text-violet-600"
+            icon={<DeleteOutlined />}
+            disabled={!editable}
+            onClick={() => deleteOptionHandler(index)}
+          >
+            Remove
+          </Button>
+        </div>
+        <Space direction="horizontal" className="w-6/12 flex pt-1 justify-between items-center">
+          <span className="text-gray-400">Navigate to</span>
+          <span className="text-violet-400 flex items-center gap-1">
+            <ClockCircleOutlined />
+            <span>Deplay 7h</span>
+          </span>
+        </Space>
+      </div>
+      <div className="w-full flex justify-between">
+        <div className="w-6/12 flex pt-0.25 justify-between items-center pr-2.5">
+          <Input
+            className="w-full"
+            value={label}
+            onChange={(e:any) => { setLabel(e.target.value); }}
+            onBlur={() => { changeOptionHandler(label, index); }}
+          />
+        </div>
+        <div className="w-6/12 flex pt-0.25 justify-between items-center">
+          <Select
+            value={currentNode?.title || currentNode?.id}
+            suffixIcon={<ArrowLeftOutlined />}
+            options={possibleOptions?.map((p:any) => {
+              return {
+                value: p.id,
+                label: p.title ? p.title : p.id,
+              };
+            })}
+            className="w-full"
+            onChange={(value) => {
+              addAndDeleteOptionHandler({
+                id: value,
+                title: label,
+              }, index);
+            }}
+          />
+        </div>
+      </div>
+    </Space>
+  );
+};
+
 /**
  *
  * @param IVoteMachineConfigProps
@@ -73,26 +145,22 @@ const ConfigPanel = ({
     id: '', title: '',
   });
   const [countedBy, setCountedBy] = useState(token ? 'token' : 'count');
-  const addNewOptionHandler = () => {
-    if (newOption.id && newOption.title) {
+  const addNewOptionHandler = (newOptionData:any) => {
+    if (newOptionData.id && newOptionData.title) {
       const opts = options ? [...options] : [];
       const chds = children ? [...children] : [];
       onChange({
         data: {
           options: [
             ...opts,
-            newOption.title,
+            newOptionData.title,
           ],
         },
         children: [
           ...chds,
-          newOption.id,
+          newOptionData.id,
         ],
       });
-      setNewOption({
-        id: '', title: '',
-      });
-      setShowNewOptionDrawer(false);
     }
   };
   const deleteOptionHandler = (index:number) => {
@@ -109,10 +177,10 @@ const ConfigPanel = ({
       ],
     });
   };
-  const changeOptionHandler = (e:any, index:number) => {
+  const changeOptionHandler = (value:any, index:number) => {
     const newData = { ...data };
     const newOptions = [...options];
-    newOptions[index] = e.target.value;
+    newOptions[index] = value;
     onChange({
       data: {
         ...newData,
@@ -143,6 +211,34 @@ const ConfigPanel = ({
         token: e.target.value,
       },
     });
+  };
+  const addAndDeleteOptionHandler = (newOptionData:any, oldIndex:number) => {
+    if (newOptionData.id && newOptionData.title) {
+      const newData = {
+        options: [
+          ...options.slice(0, oldIndex),
+          ...options.slice(oldIndex + 1),
+        ],
+      };
+      const newChildren = [
+        ...children.slice(0, oldIndex),
+        ...children.slice(oldIndex + 1),
+      ];
+      const opts = options ? [...newData.options] : [];
+      const chds = children ? [...newChildren] : [];
+      onChange({
+        data: {
+          options: [
+            ...opts,
+            newOptionData.title,
+          ],
+        },
+        children: [
+          ...chds,
+          newOptionData.id,
+        ],
+      });
+    }
   };
   const getThresholdText = () => {
     let rs = '';
@@ -215,44 +311,21 @@ const ConfigPanel = ({
       {options?.length > 0 ?
       (
         <Space direction="vertical" size="small" className="w-full">
-          <div className="text-md">List of options</div>
-          {options?.map((option:any, index:number) => {
+          <div className="text-lg">Options</div>
+          {options?.map((option:string, index:number) => {
             const currentNode = allNodes.find((node) => node.id === children[index]);
             return (
-              <Space.Compact
-                key={children[index]}
-                className="mb-2 inline-flex items-center w-full"
-                direction="horizontal"
-              >
-                <Input
-                  prefix={
-                    currentNode.title ?
-                    (
-                      <Tag>
-                        <BranchesOutlined className="pr-2 inlinex-flex items-center" />
-                        {currentNode.title}
-                      </Tag>
-                    )
-                    :
-                    (
-                      <Tag>
-                        <BranchesOutlined className="pr-2 inlinex-flex items-center" />
-                        {currentNode.id}
-                      </Tag>
-                    )
-                  }
-                  className="w-full"
-                  value={option}
-                  onChange={(e:any) => { changeOptionHandler(e, index); }}
-                />
-                <Button
-                  className="mr-2 flex items-center justify-center disabled:text-slate-300 text-red-600"
-                  type="default"
-                  icon={<DeleteOutlined />}
-                  onClick={() => { deleteOptionHandler(index); }}
-                  disabled={!editable}
-                />
-              </Space.Compact>
+              <Option
+                key={option}
+                index={index}
+                option={option}
+                currentNode={currentNode}
+                changeOptionHandler={changeOptionHandler}
+                deleteOptionHandler={deleteOptionHandler}
+                possibleOptions={posibleOptions}
+                editable={editable}
+                addAndDeleteOptionHandler={addAndDeleteOptionHandler}
+              />
             );
           },
           )}
@@ -313,7 +386,13 @@ const ConfigPanel = ({
             type="default"
             className="inline-flex items-center text-center justify-center w-full mt-4"
             icon={<PlusCircleOutlined />}
-            onClick={addNewOptionHandler}
+            onClick={() => {
+              addNewOptionHandler(newOption);
+              setNewOption({
+                id: '', title: '',
+              });
+              setShowNewOptionDrawer(false);
+            }}
           >
             Add
           </Button>
