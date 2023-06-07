@@ -22,6 +22,7 @@ const Setting = () => {
     queryWeb2Integration({
       orgId: extractIdFromIdString(orgIdString),
       onLoad: (data) => {
+        // TODO: move all redux to utils/data
         dispatch(setWeb2Integrations(data));
         setIntegrations(data);
       },

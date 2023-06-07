@@ -48,6 +48,7 @@ const EditMission = () => {
       queryWeb2Integration({
         orgId,
         onLoad: (data) => {
+          // TODO: move all redux to utils/data
           dispatch(setWeb2Integrations(data));
           dispatch(initialize({}));
           setWeb2IntegrationsState(data);

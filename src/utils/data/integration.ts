@@ -25,6 +25,18 @@ export const queryWeb2Integration = async ({
       delete newd.preset_banner_url;
       newData.push(newd);
     });
+    if (newData) {
+      newData.push({
+        id: '-1',
+        username: ' ', // every integration come with a username aka user identifier
+        provider: 'custom',
+        integrationId: -1,
+        params: {
+          key: '',
+          value: '',
+        },
+      });
+    }
     onLoad(newData);
   } else if (error) {
     onError(error);

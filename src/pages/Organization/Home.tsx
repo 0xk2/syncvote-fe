@@ -15,7 +15,9 @@ import Meta from 'antd/es/card/Meta';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
 import DataIcon from '@assets/icons/svg-icons/DataIcon';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import { queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg } from '@utils/data';
+import {
+  queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg,
+} from '@utils/data';
 
 interface IOrg {
   id: number;
@@ -57,6 +59,7 @@ const HomePage = () => {
     queryWeb2Integration({
       orgId,
       onLoad: (data) => {
+        // TODO: move all of this to utils/data
         dispatch(setWeb2Integrations(data));
       },
       dispatch,

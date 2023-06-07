@@ -88,18 +88,7 @@ const BluePrint = () => {
       queryWeb2Integration({
         orgId,
         onLoad: (data) => {
-          if (data) {
-            data.push({
-              id: '-1',
-              username: ' ', // every integration come with a username aka user identifier
-              provider: 'custom',
-              integrationId: -1,
-              params: {
-                key: '',
-                value: '',
-              },
-            });
-          }
+          // TODO: move all redux to utils/data
           dispatch(setWeb2Integrations(data));
           dispatch(initialize({}));
           setWeb2IntegrationsState(data);
