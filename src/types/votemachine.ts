@@ -34,4 +34,5 @@ export interface IVoteMachine {
   deleteChildNode: (data: any, children:string[], childId:string) => void,
   getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element,
   getIcon: () => JSX.Element,
+  getInitialData: () => any,
 }

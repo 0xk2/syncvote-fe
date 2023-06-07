@@ -126,7 +126,6 @@ const ConfigPanel = ({
   return (
     <Space direction="vertical" size="large" className="mb-4 w-full">
       <Space direction="vertical" size="small" className="w-full">
-        <div className="text-lg">Poll Vote</div>
         <div className="bg-slate-100 p-2 w-full">{`Everyone choose up to ${upTo || 'X'} options until ${upTo || 'X'} options reach ${maxStr || 'condition to pass'}`}</div>
       </Space>
       <Space direction="vertical" size="small" className="w-full">
@@ -326,6 +325,17 @@ const getIcon = () => {
   );
 };
 
+const getInitialData = () => {
+  const data : IData = {
+    options: [],
+    max: undefined,
+    next: '',
+    fallback: '',
+    upTo: 0,
+  };
+  return data;
+};
+
 const VoteMachine : IVoteMachine = {
   ConfigPanel,
   getProgramAddress,
@@ -334,6 +344,7 @@ const VoteMachine : IVoteMachine = {
   getLabel,
   getType,
   getIcon,
+  getInitialData,
 };
 
 export default VoteMachine;

@@ -278,15 +278,11 @@ const BluePrint = () => {
                         delete newData.checkpoints[index].vote_machine_type;
                         delete newData.checkpoints[index].data;
                       }
-                    }
-                  });
-                  setVersionData(newData);
-                },
-                onNew: (machineType) => {
-                  const newData = structuredClone(versionData);
-                  newData.checkpoints.forEach((v:any, index:number) => {
-                    if (v.id === selectedNodeId) {
-                      newData.checkpoints[index].vote_machine_type = machineType;
+                      if (changedData.vote_machine_type) {
+                        newData.checkpoints[index].vote_machine_type
+                        = changedData.vote_machine_type;
+                        newData.checkpoints[index].data = changedData.data;
+                      }
                     }
                   });
                   setVersionData(newData);

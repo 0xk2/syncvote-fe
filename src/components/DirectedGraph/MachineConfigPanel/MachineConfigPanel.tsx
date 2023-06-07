@@ -7,14 +7,14 @@ import RulesTab from './RulesTab';
 import TriggerTab from './TriggerTab';
 
 const MachineConfigPanel = ({
-  children, selectedNode, onChange, web2Integrations, allNodes, editable = false,
+  selectedNode, onChange, web2Integrations, allNodes, editable = false, vmConfigPanel,
 }:{
-  children: any,
   selectedNode: any,
-  onChange: (changedData:ICheckPoint) => void,
-  web2Integrations: any[],
-  allNodes: any[],
-  editable?: boolean,
+  onChange: (changedData:ICheckPoint) => void;
+  web2Integrations: any[];
+  allNodes: any[];
+  editable?: boolean;
+  vmConfigPanel:JSX.Element;
 }) => {
   const items = [
     {
@@ -36,9 +36,8 @@ const MachineConfigPanel = ({
           selectedNode={selectedNode}
           onChange={onChange}
           editable={editable}
-        >
-          {children}
-        </RulesTab>
+          vmConfigPanel={vmConfigPanel}
+        />
       ),
     },
     {

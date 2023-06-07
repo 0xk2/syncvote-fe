@@ -1,33 +1,45 @@
 import {
-  Space, Collapse, Input, Button, Select, Modal,
-  Popconfirm, Switch, Tag, Drawer,
+  Space, Drawer, Tabs,
 } from 'antd';
-import { LockFilled, UnlockOutlined } from '@ant-design/icons';
-import moment from 'moment';
 import { useState } from 'react';
-
-import { ICheckPoint } from '../../../types';
+import { EditOutlined } from '@ant-design/icons';
+import { ICheckPoint, IVoteMachine } from '../../../types';
 import ChooseVoteMachine from './ChooseVoteMachine';
+import VotingPartipation from './rules/VotingParticipant';
+import VotingDuration from './rules/VotingDuration';
+import { getVoteMachine } from '../voteMachine';
 
 const RulesTab = ({
-  selectedNode, onChange, editable = false, children,
+  selectedNode, onChange, editable = false, vmConfigPanel,
 }:{
-  selectedNode:ICheckPoint,
-  onChange: (changedData:ICheckPoint) => void,
-  editable?: boolean,
-  children: any;
+  selectedNode:ICheckPoint;
+  onChange: (changedData:ICheckPoint) => void;
+  editable?: boolean;
+  vmConfigPanel: JSX.Element;
 }) => {
   const duration = selectedNode?.data?.duration;
-  const days = duration ? Math.floor(duration / 86400) : 0;
-  const mins = duration ? Math.floor((duration % 86400) / 60) : 0;
-  const seconds = duration ? duration % 60 : 0;
-  const dateChange = (durationChanged:number) => {
-    const node = structuredClone(selectedNode);
-    node.data.duration = durationChanged;
-    onChange(node);
-  };
-  const locked = selectedNode?.locked ? selectedNode?.locked : {};
   const [vmDrawerVisbibility, setvmDrawerVisbibility] = useState(false);
+  const setVoteMachine = ({
+    type, initialData,
+  }: {
+    type:string;
+    initialData:any;
+  }) => {
+    if (type !== 'isEnd') {
+      const newNode = structuredClone(selectedNode);
+      newNode.vote_machine_type = type;
+      newNode.data = initialData;
+      newNode.children = [];
+      newNode.isEnd = false;
+      onChange(newNode);
+    } else {
+      onChange({
+        isEnd: true,
+      });
+    }
+    setvmDrawerVisbibility(false);
+  };
+  const machine:IVoteMachine = getVoteMachine(selectedNode?.vote_machine_type || '');
   return (
     <>
       <Drawer
@@ -35,181 +47,69 @@ const RulesTab = ({
         onClose={() => {
           setvmDrawerVisbibility(false);
         }}
+        title="Choose Vote Machine"
       >
         <ChooseVoteMachine
-          onNew={(data:any) => {
-            console.log('waht is this? ', data);
-          }}
+          changeVoteMachineType={setVoteMachine}
           currentType={selectedNode?.vote_machine_type}
         />
       </Drawer>
       <Space direction="vertical" size="large" className="w-full">
-        <Button
-          onClick={() => {
-            setvmDrawerVisbibility(true);
-          }}
-        >
-          Change machine type
-        </Button>
-        <Space direction="horizontal" className="w-full justify-between p-2 border-slate-300 border rounded">
-          <Space direction="horizontal">
-            <span>
-              Change this checkpoint to
-              <Tag className="ml-2" color={selectedNode?.isEnd ? 'red' : 'blue'}>
-                {selectedNode?.isEnd ? 'votable node' : ' end node'}
-              </Tag>
-            </span>
-            {selectedNode?.isEnd ?
-            (
-              <Switch
-                checked={selectedNode?.isEnd}
-                disabled={!editable}
-                onChange={(isEnd) => {
-                  onChange({
-                    isEnd,
-                  });
-                }}
-              />
-            )
-            :
-            (
-              <Popconfirm
-                title="Are you sure?"
-                description="This will delete all connection to other nodes!"
-                onConfirm={() => {
-                  onChange({
-                    isEnd: !selectedNode?.isEnd,
-                  });
-                }}
-                disabled={locked.isEnd || !editable}
-              >
-                <Switch
-                  checked={selectedNode?.isEnd}
-                  disabled={locked.isEnd || !editable}
-                />
-              </Popconfirm>
-            )
-            }
-          </Space>
-          <Button
-            icon={locked.isEnd ? <LockFilled /> : <UnlockOutlined />}
+        {editable && !selectedNode?.isEnd ? (
+          <div
+            className="w-full flex justify-between items-center text-lg p-2 cursor-pointer rounded-lg border-2 hover:border-violet-500 hover:text-violet-500"
             onClick={() => {
-              const newLocked = { ...locked, isEnd: !locked.isEnd };
-              const newNode = structuredClone(selectedNode);
-              newNode.locked = newLocked;
-              onChange(newNode);
+              setvmDrawerVisbibility(true);
             }}
-            disabled={!editable}
+          >
+            <div className="flex items-center gap-4">
+              {machine?.getIcon()}
+              {machine?.getName()}
+            </div>
+            <EditOutlined />
+          </div>
+        )
+        :
+          <></>
+        }
+        {editable && selectedNode?.isEnd ? (
+          <ChooseVoteMachine
+            changeVoteMachineType={setVoteMachine}
+            currentType={undefined}
           />
-        </Space>
-        {!selectedNode?.isEnd ?
-        (
-          <Collapse defaultActiveKey={['1']}>
-            <Collapse.Panel header="Voting Logic" key="1">
-              {children}
-            </Collapse.Panel>
-          </Collapse>
+        )
+        :
+          <></>
+        }
+        {!selectedNode?.isEnd ? (
+          <Tabs
+            defaultActiveKey="1"
+            items={[
+              {
+                key: '1',
+                label: 'Options & Results',
+                children: vmConfigPanel,
+              },
+              {
+                key: '2',
+                label: 'Voting participants',
+                children: <VotingPartipation />,
+              },
+              {
+                key: '3',
+                label: 'Voting Duration',
+                children: <VotingDuration
+                  duration={duration}
+                  onChange={onChange}
+                  editable={editable}
+                  selectedNode={selectedNode}
+                />,
+              },
+            ]}
+          />
         )
         : null
         }
-        <Collapse defaultActiveKey={['1']}>
-          <Collapse.Panel header={`Voting duration (${duration ? moment.duration(duration, 'seconds').humanize() : 'missing'})`} key="1">
-            <Space direction="horizontal">
-              <Space direction="horizontal">
-                <Input
-                  addonAfter="days"
-                  value={days}
-                  onChange={(e) => {
-                    dateChange(
-                      parseInt(e.target.value, 10) * 86400 + mins * 60 + seconds,
-                    );
-                  }}
-                  disabled={locked.duration}
-                />
-                <Input
-                  addonAfter="minutes"
-                  value={mins}
-                  onChange={(e) => {
-                    dateChange(
-                      days * 86400 + parseInt(e.target.value, 10) * 60 + seconds,
-                    );
-                  }}
-                  disabled={locked.duration}
-                />
-                <Input
-                  addonAfter="seconds"
-                  value={seconds}
-                  onChange={(e) => {
-                    dateChange(
-                      days * 86400 + mins * 60 + parseInt(e.target.value, 10),
-                    );
-                  }}
-                  disabled={locked.duration}
-                />
-              </Space>
-              <Button
-                icon={locked.duration ? <LockFilled /> : <UnlockOutlined />}
-                onClick={() => {
-                  if (duration === undefined || Number.isNaN(duration) || duration === 0) {
-                    Modal.error({
-                      title: 'Invalid data',
-                      content: 'Cannot lock duration if it is not set',
-                    });
-                  } else {
-                    const newLocked = { ...locked, duration: !locked.duration };
-                    const newNode = structuredClone(selectedNode);
-                    newNode.locked = newLocked;
-                    onChange(newNode);
-                  }
-                }}
-                disabled={!editable}
-              />
-            </Space>
-          </Collapse.Panel>
-          <Collapse.Panel header="Participation" key="2">
-            <Select
-              style={{ width: '100%' }}
-              defaultValue="whitelist"
-              options={[
-                {
-                  key: 'whitelist',
-                  label: 'A lits of addresses',
-                  value: 'whitelist',
-                },
-                // choosing this option would engage Votemachine
-                {
-                  key: 'spl',
-                  label: 'A SPL Token owner',
-                  value: 'spl',
-                },
-                // choosing this option would engage Votemachine
-                {
-                  key: 'erc20',
-                  label: 'An ERC20 Token owner',
-                  value: 'erc20',
-                },
-              ]}
-            />
-          </Collapse.Panel>
-          <Collapse.Panel header="Voting Power Provider" key="3">
-            <Select
-              style={{ width: '100%' }}
-              defaultValue="default"
-              options={[
-                {
-                  key: 'default',
-                  label: 'Use voting power provided by voting program',
-                  value: '',
-                },
-                {
-                  key: 'a_system_owned_address',
-                  label: 'Provide by SyncVote',
-                  value: 'a_system_owned_address',
-                },
-              ]}
-            />
-          </Collapse.Panel>
-        </Collapse>
       </Space>
     </>
   );

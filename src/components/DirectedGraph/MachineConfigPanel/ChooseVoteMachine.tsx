@@ -5,10 +5,10 @@ import { getAllVoteMachines } from '../voteMachine';
 const warningText = 'Change this would destroy all the current node setting!';
 
 const Option = ({
-  onNew, type, title, selected, icon,
+  changeVoteMachineType, type, title, selected, icon,
 }:{
-  onNew: (data:any) => void,
-  type: string | undefined;
+  changeVoteMachineType: () => void,
+  type: string;
   title: any;
   selected: boolean;
   icon: JSX.Element;
@@ -18,8 +18,9 @@ const Option = ({
       title="Are you sure?"
       description={warningText}
       onConfirm={() => {
-        onNew(type);
+        changeVoteMachineType();
       }}
+      disabled={selected}
     >
       <div
         className={`p-4 border border-slate-300 mb-2 cursor-pointer hover:bg-slate-100 w-full rounded-md ${selected ? 'bg-slate-100' : ''} gap-2 flex items-center`}
@@ -33,9 +34,14 @@ const Option = ({
 };
 
 const ChooseVoteMachine = ({
-  onNew, currentType,
+  changeVoteMachineType, currentType,
 }:{
-  onNew: (data:any) => void;
+  changeVoteMachineType: ({
+    type, initialData,
+  } : {
+    type: string;
+    initialData: any;
+  }) => void;
   currentType: string | undefined;
 }) => {
   const allVoteMachines = getAllVoteMachines();
@@ -50,9 +56,14 @@ const ChooseVoteMachine = ({
       </Space>
       <Option
         key="isEnd"
-        type={undefined}
+        type="_"
         title="End Node"
-        onNew={onNew}
+        changeVoteMachineType={() => {
+          changeVoteMachineType({
+            type: 'isEnd',
+            initialData: undefined,
+          });
+        }}
         icon={<StopOutlined />}
         selected={currentType === undefined}
       />
@@ -61,7 +72,12 @@ const ChooseVoteMachine = ({
         return (
           <Option
             key={type}
-            onNew={onNew}
+            changeVoteMachineType={() => {
+              changeVoteMachineType({
+                type,
+                initialData: machine.getInitialData(),
+              });
+            }}
             type={type}
             title={machine.getName()}
             icon={machine.getIcon()}

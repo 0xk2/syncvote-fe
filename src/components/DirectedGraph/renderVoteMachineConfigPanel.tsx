@@ -3,35 +3,23 @@ import { Button, Drawer } from 'antd';
 import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
 import { getVoteMachine } from './voteMachine';
 import { IVoteMachine } from '../../types';
-import ChooseVoteMachine from './MachineConfigPanel/ChooseVoteMachine';
 
 const renderVoteMachineConfigPanel = ({
   // TODO: change versionData to a better name
-  versionData, selectedNodeId, onChange, onNew, onDelete, onClose, web2Integrations,
+  versionData, selectedNodeId, onChange, onDelete, onClose, web2Integrations,
   editable = false,
 }: {
-  versionData: any, selectedNodeId:string, onChange: (data:any) => void, onNew: (data:any) => void,
+  versionData: any, selectedNodeId:string, onChange: (data:any) => void,
   onDelete: (data:any) => void, onClose: () => void,
   web2Integrations: any[],
   editable?: boolean,
 }) => {
   const selectedNode = versionData.checkpoints?.find((chk:any) => chk.id === selectedNodeId);
-  let configPanel = (
-    <MachineConfigPanel
-      selectedNode={selectedNode}
-      onChange={onChange}
-      web2Integrations={web2Integrations}
-      allNodes={versionData.checkpoints}
-      editable={editable}
-    >
-      <ChooseVoteMachine
-        onNew={onNew}
-        currentType={selectedNode?.vote_machine_type}
-      />
-    </MachineConfigPanel>
-  );
-  if (selectedNode !== undefined && selectedNode.vote_machine_type !== undefined) {
-    const machine:IVoteMachine = getVoteMachine(selectedNode.vote_machine_type);
+  let configPanel = (<></>);
+  if (selectedNode !== undefined) {
+    const machine:IVoteMachine = getVoteMachine(selectedNode.vote_machine_type) || {
+      ConfigPanel: () => (<></>),
+    };
     const { ConfigPanel } = machine;
     const data = selectedNode.data ? selectedNode.data : {};
     configPanel = (
@@ -41,16 +29,19 @@ const renderVoteMachineConfigPanel = ({
         web2Integrations={web2Integrations}
         allNodes={versionData.checkpoints}
         editable={editable}
-      >
-        <ConfigPanel
-          editable={editable}
-          currentNodeId={selectedNodeId}
-          onChange={onChange}
-          children={selectedNode.children}
-          allNodes={versionData.checkpoints}
-          data={structuredClone(data)}
-        />
-      </MachineConfigPanel>
+        vmConfigPanel={
+          (
+            <ConfigPanel
+              editable={editable}
+              currentNodeId={selectedNodeId}
+              onChange={onChange}
+              children={selectedNode.children}
+              allNodes={versionData.checkpoints}
+              data={structuredClone(data)}
+            />
+          )
+        }
+      />
     );
   }
   return (

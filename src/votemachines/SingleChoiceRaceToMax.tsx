@@ -302,7 +302,6 @@ const ConfigPanel = ({
   return (
     <Space direction="vertical" size="large" className="mb-4 w-full">
       <Space direction="vertical" size="small" className="w-full">
-        <div className="text-lg">Single Choice</div>
         <div className="bg-slate-100 p-2 w-full">
           <span className="mr-0.5">Everyone choose ONE option until one option reach</span>
           {getMaxText()}
@@ -525,6 +524,14 @@ const getIcon = () => {
   );
 };
 
+const getInitialData = () => {
+  const data : IData = {
+    options: [],
+    max: 0,
+  };
+  return data;
+};
+
 const VoteMachine : IVoteMachine = {
   ConfigPanel,
   getProgramAddress,
@@ -533,6 +540,7 @@ const VoteMachine : IVoteMachine = {
   getLabel,
   getType,
   getIcon,
+  getInitialData,
 };
 
 export default VoteMachine;
