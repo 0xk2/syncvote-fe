@@ -19,7 +19,7 @@ const MachineConfigPanel = ({
   const items = [
     {
       key: '1',
-      label: 'Context',
+      label: 'Content',
       children: (
         <ContextTab
           selectedNode={selectedNode}
@@ -42,7 +42,7 @@ const MachineConfigPanel = ({
     },
     {
       key: '3',
-      label: 'Triggers',
+      label: 'Automated actions',
       children: <TriggerTab
         web2Integrations={web2Integrations}
         triggers={selectedNode?.triggers || []}

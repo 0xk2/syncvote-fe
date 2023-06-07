@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import {
-  BranchesOutlined, CarryOutOutlined, DeleteOutlined, NodeIndexOutlined,
-  PlusCircleOutlined, ShareAltOutlined, TwitterOutlined,
+  BranchesOutlined, CarryOutOutlined, DeleteOutlined, MoneyCollectOutlined, NodeIndexOutlined,
+  PlusCircleOutlined, QuestionCircleOutlined, ShareAltOutlined, TwitterOutlined,
 } from '@ant-design/icons';
 import {
-  Input, Select, Space, Button, Tag, Drawer,
+  Input, Select, Space, Button, Tag, Drawer, Tooltip,
 } from 'antd';
 import {
   IVoteMachine, ICheckPoint, IVoteMachineGetLabelProps, IVoteMachineConfigProps,
@@ -50,16 +50,18 @@ const ConfigPanel = ({
   currentNodeId = '', votingPowerProvider = '', whitelist = [], //eslint-disable-line
   data = {
     max: 0,
+    token: '', // spl token
     options: [],
   },
   editable,
   onChange = (data:ICheckPoint) => {}, children = [], allNodes = [], //eslint-disable-line
 }:IVoteMachineConfigProps) => {
-  const { max, options } = data;
-  let maxStr = '0';
+  const { max, token, options } = data;
+  let tmpMaxStr = '0';
   if (max) {
-    maxStr = max < 1 ? `${max * 100}%` : `${max}`;
+    tmpMaxStr = max < 1 ? `${max * 100}%` : `${max}`;
   }
+  const [maxStr, setMaxStr] = useState(tmpMaxStr);
   const posibleOptions:ICheckPoint[] = [];
   const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
   allNodes.forEach((child) => {
@@ -70,48 +72,151 @@ const ConfigPanel = ({
   const [newOption, setNewOption] = useState({
     id: '', title: '',
   });
+  const [countedBy, setCountedBy] = useState(token ? 'token' : 'count');
+  const addNewOptionHandler = () => {
+    if (newOption.id && newOption.title) {
+      const opts = options ? [...options] : [];
+      const chds = children ? [...children] : [];
+      onChange({
+        data: {
+          options: [
+            ...opts,
+            newOption.title,
+          ],
+        },
+        children: [
+          ...chds,
+          newOption.id,
+        ],
+      });
+      setNewOption({
+        id: '', title: '',
+      });
+      setShowNewOptionDrawer(false);
+    }
+  };
+  const deleteOptionHandler = (index:number) => {
+    onChange({
+      data: {
+        options: [
+          ...options.slice(0, index),
+          ...options.slice(index + 1),
+        ],
+      },
+      children: [
+        ...children.slice(0, index),
+        ...children.slice(index + 1),
+      ],
+    });
+  };
+  const changeOptionHandler = (e:any, index:number) => {
+    const newData = { ...data };
+    const newOptions = [...options];
+    newOptions[index] = e.target.value;
+    onChange({
+      data: {
+        ...newData,
+        options: newOptions,
+      },
+    });
+  };
+  const changeMaxHandler = (e:any) => {
+    const str = e.target.value;
+    let tMax = 0;
+    if (str !== '') {
+      tMax = str.indexOf('%') > 0 ? parseFloat(str) / 100 : parseInt(str, 10);
+    }
+    if (tMax > 1) {
+      setMaxStr(tMax.toString());
+    }
+    onChange({
+      data: {
+        ...data,
+        max: tMax,
+      },
+    });
+  };
+  const changeTokenHandler = (e:any) => {
+    onChange({
+      data: {
+        ...data,
+        token: e.target.value,
+      },
+    });
+  };
+  const getThresholdText = () => {
+    let rs = '';
+    if (countedBy === 'count') { // vote counting
+      if (max > 1) { // number of vote
+        rs = 'Total votes made';
+      } else {
+        rs = 'Percentage of votes made';
+      }
+    } else if (countedBy === 'token') { // token counting
+      if (max > 1) { // number of vote
+        rs = 'Total token voted';
+      } else {
+        rs = 'Percentage of voted token';
+      }
+    }
+    return rs;
+  };
+  const getMaxText = () => {
+    let rs = <span>condition to pass</span>;
+    const tokenEle = token ? <Tag>{token}</Tag> : <Tag color="red">Missing token</Tag>;
+    if (max || Number.isNaN(max)) {
+      if (max < 1) {
+        if (countedBy === 'count') {
+          rs = (
+            <span>
+              {`${max * 100}% of votes`}
+            </span>
+          );
+        } else if (countedBy === 'token') {
+          rs = (
+            <span>
+              <span className="mr-1">
+                {`${max * 100}% of total voted tokens`}
+              </span>
+              {tokenEle}
+            </span>
+          );
+        }
+      } else if (max >= 1) {
+        if (countedBy === 'count') {
+          rs = (
+            <span>
+              {`${max} votes`}
+            </span>
+          );
+        } else if (countedBy === 'token') {
+          rs = (
+            <span>
+              <span className="mr-1">
+                {`${max} tokens`}
+              </span>
+              {tokenEle}
+            </span>
+          );
+        }
+      }
+    }
+    return rs;
+  };
   return (
     <Space direction="vertical" size="large" className="mb-4 w-full">
       <Space direction="vertical" size="small" className="w-full">
         <div className="text-lg">Single Choice</div>
         <div className="bg-slate-100 p-2 w-full">
-          {`Everyone choose ONE option until one option reach ${max || 'condition to pass'}`}
+          <span className="mr-0.5">Everyone choose ONE option until one option reach</span>
+          {getMaxText()}
         </div>
-      </Space>
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-md">Min no of vote to pass (e.g: 3, 10%)</div>
-        <Space.Compact className="w-full">
-          <Input
-            type="text"
-            className="w-full"
-            prefix={(
-              <div className="text-slate-300">
-                <CarryOutOutlined className="inline-flex items-center pr-2" />
-              </div>
-            )}
-            value={maxStr}
-            disabled={!editable}
-            onChange={(e) => {
-              const str = e.target.value;
-              let tMax = 0;
-              if (str !== '') {
-                tMax = str.indexOf('%') > 0 ? parseFloat(str) / 100 : parseInt(str, 10);
-              }
-              onChange({
-                data: {
-                  ...data,
-                  max: tMax,
-                },
-              });
-            }}
-          />
-        </Space.Compact>
       </Space>
       {options?.length > 0 ?
       (
         <Space direction="vertical" size="small" className="w-full">
           <div className="text-md">List of options</div>
-          {options?.map((option:any, index:any) => {
+          {options?.map((option:any, index:number) => {
             const currentNode = allNodes.find((node) => node.id === children[index]);
             return (
               <Space.Compact
@@ -138,36 +243,13 @@ const ConfigPanel = ({
                   }
                   className="w-full"
                   value={option}
-                  onChange={(e:any) => {
-                    const newData = { ...data };
-                    const newOptions = [...options];
-                    newOptions[index] = e.target.value;
-                    onChange({
-                      data: {
-                        ...newData,
-                        options: newOptions,
-                      },
-                    });
-                  }}
+                  onChange={(e:any) => { changeOptionHandler(e, index); }}
                 />
                 <Button
                   className="mr-2 flex items-center justify-center disabled:text-slate-300 text-red-600"
                   type="default"
                   icon={<DeleteOutlined />}
-                  onClick={() => {
-                    onChange({
-                      data: {
-                        options: [
-                          ...options.slice(0, index),
-                          ...options.slice(index + 1),
-                        ],
-                      },
-                      children: [
-                        ...children.slice(0, index),
-                        ...children.slice(index + 1),
-                      ],
-                    });
-                  }}
+                  onClick={() => { deleteOptionHandler(index); }}
                   disabled={!editable}
                 />
               </Space.Compact>
@@ -231,33 +313,108 @@ const ConfigPanel = ({
             type="default"
             className="inline-flex items-center text-center justify-center w-full mt-4"
             icon={<PlusCircleOutlined />}
-            onClick={() => {
-              if (newOption.id && newOption.title) {
-                const opts = options ? [...options] : [];
-                const chds = children ? [...children] : [];
-                onChange({
-                  data: {
-                    options: [
-                      ...opts,
-                      newOption.title,
-                    ],
-                  },
-                  children: [
-                    ...chds,
-                    newOption.id,
-                  ],
-                });
-                setNewOption({
-                  id: '', title: '',
-                });
-                setShowNewOptionDrawer(false);
-              }
-            }}
+            onClick={addNewOptionHandler}
           >
             Add
           </Button>
         </Space>
       </Drawer>
+      <Space direction="vertical" size="small" className="w-full">
+        <Space className="text-md" direction="horizontal" size="small">
+          <span className="text-lg">Voting results</span>
+          <div className="items-center flex">
+            <Tooltip title="Counted by number of votes (address showing up) or tokens">
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </div>
+        </Space>
+        <Space direction="vertical" size="small" className="w-full">
+          <div className="text-sm text-slate-600">
+            Counted by
+          </div>
+          <Select
+            className="w-full"
+            value={countedBy}
+            options={
+              [
+                {
+                  label: 'Number of votes',
+                  value: 'count',
+                },
+                {
+                  label: 'Number of token',
+                  value: 'token',
+                },
+              ]
+            }
+            onChange={(value) => {
+              setCountedBy(value);
+            }}
+          />
+        </Space>
+      </Space>
+      <Space direction="vertical" size="small" className="w-full">
+        <Space className="text-md" direction="horizontal" size="small">
+          <span className="text-lg">
+            Voting condition
+          </span>
+          <div className="items-center flex">
+            <Tooltip title="Condition for wining option">
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </div>
+        </Space>
+        <Space direction="vertical" size="small" className="w-full">
+          <div className="text-sm text-slate-600">
+            Threshold calculated by
+          </div>
+          <Input
+            type="text"
+            className="w-full"
+            disabled
+            value={getThresholdText()}
+          />
+        </Space>
+        <Space direction="vertical" size="small" className="w-full">
+          <div className="text-sm text-slate-600">
+            Threshold value for each result (at least)
+          </div>
+          <Input
+            type="text"
+            className="w-full"
+            prefix={(
+              <div className="text-slate-600">
+                <CarryOutOutlined className="inline-flex items-center pr-2" />
+              </div>
+            )}
+            value={maxStr}
+            disabled={!editable}
+            onChange={(e) => setMaxStr(e.target.value)}
+            onBlur={changeMaxHandler}
+          />
+        </Space>
+        {countedBy === 'token' ?
+          (
+            <Space direction="vertical" size="small" className="w-full">
+              <div className="text-sm text-slate-600">
+                Token using for voting
+              </div>
+              <Input
+                type="text"
+                className="w-full"
+                prefix={(
+                  <div className="text-slate-300">
+                    <MoneyCollectOutlined className="inline-flex items-center pr-2" />
+                  </div>
+                )}
+                value={token}
+                disabled={!editable}
+                onChange={changeTokenHandler}
+              />
+            </Space>
+          )
+          : <></>}
+      </Space>
     </Space>
   );
 };
