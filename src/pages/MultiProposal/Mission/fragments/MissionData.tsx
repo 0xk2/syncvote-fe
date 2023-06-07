@@ -81,15 +81,6 @@ const Data = ({
               });
               setVersionData(newData);
             },
-            onNew: (machineType) => {
-              const newData = structuredClone(versionData);
-              newData.checkpoints.forEach((v:any, index:number) => {
-                if (v.id === selectedNodeId) {
-                  newData.checkpoints[index].vote_machine_type = machineType;
-                }
-              });
-              setVersionData(newData);
-            },
             onDelete: (id) => {
               if (id === versionData.start) {
                 Modal.error({
