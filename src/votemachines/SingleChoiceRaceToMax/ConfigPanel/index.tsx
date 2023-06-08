@@ -4,7 +4,7 @@ import {
 import { useState } from 'react';
 import { ICheckPoint, IVoteMachineConfigProps } from '../../../types';
 import { Option } from './option';
-import VotingResult from './votingResult';
+import VotingResult from './VotingResult';
 import VotingCondition from './VotingCondition';
 import NewOptionDrawer from './NewOptionDrawer';
 
