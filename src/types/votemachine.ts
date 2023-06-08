@@ -1,3 +1,5 @@
+import { ICheckPoint } from './checkpoint';
+
 export interface IVoteMachineConfigProps {
   editable: boolean,
   currentNodeId?: string,
@@ -27,12 +29,18 @@ export interface IVoteMachineGetLabelProps {
 }
 
 export interface IVoteMachine {
-  ConfigPanel: (props:IVoteMachineConfigProps) => JSX.Element,
-  getName: () => string,
-  getProgramAddress: () => string,
-  getType: () => string,
-  deleteChildNode: (data: any, children:string[], childId:string) => void,
-  getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element,
-  getIcon: () => JSX.Element,
-  getInitialData: () => any,
+  ConfigPanel: (props:IVoteMachineConfigProps) => JSX.Element;
+  getName: () => string;
+  getProgramAddress: () => string;
+  getType: () => string;
+  deleteChildNode: (data: any, children:string[], childId:string) => void;
+  getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element;
+  getIcon: () => JSX.Element;
+  getInitialData: () => any;
+  explain: ({
+    checkpoint, data,
+  }:{
+    checkpoint:ICheckPoint,
+    data:any,
+  }) => JSX.Element;
 }

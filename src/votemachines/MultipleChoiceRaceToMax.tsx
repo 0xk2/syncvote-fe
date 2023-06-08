@@ -7,7 +7,9 @@ import {
 } from 'antd';
 import { useState } from 'react';
 
-import { IVoteMachine, IVoteMachineGetLabelProps, IVoteMachineConfigProps } from '../types';
+import {
+  IVoteMachine, IVoteMachineGetLabelProps, IVoteMachineConfigProps, ICheckPoint,
+} from '../types';
 
 interface Option {
   title: string,
@@ -336,6 +338,20 @@ const getInitialData = () => {
   return data;
 };
 
+const explain = ({
+  checkpoint, data //eslint-disable-line
+}: {
+  checkpoint: ICheckPoint,
+  data: IData,
+}) => {
+  console.log(checkpoint, data);
+  return (
+    <div>
+      Comming soon
+    </div>
+  );
+};
+
 const VoteMachine : IVoteMachine = {
   ConfigPanel,
   getProgramAddress,
@@ -345,6 +361,7 @@ const VoteMachine : IVoteMachine = {
   getType,
   getIcon,
   getInitialData,
+  explain,
 };
 
 export default VoteMachine;

@@ -71,7 +71,7 @@ const Flow = ({
   );
 };
 // TODO: expose a function for manually trigger fitview
-const DirectedGraph = ({
+export const DirectedGraph = ({
   data, onNodeClick = () => {},
   selectedNodeId,
   onPaneClick = () => {},
@@ -109,5 +109,3 @@ const DirectedGraph = ({
     </div>
   );
 };
-
-export default DirectedGraph;

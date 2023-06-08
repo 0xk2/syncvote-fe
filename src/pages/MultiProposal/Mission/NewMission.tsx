@@ -1,4 +1,3 @@
-import { initialize, setWorkflows } from '@redux/reducers/ui.reducer';
 import {
   queryWorkflow, upsertAMission,
 } from '@utils/data';
@@ -48,9 +47,7 @@ const NewMission = () => {
     if (workflowIdString && workflows.length === 0 && initialized === false) {
       queryWorkflow({
         orgId,
-        onLoad: (data) => {
-          dispatch(setWorkflows(data));
-          dispatch(initialize({}));
+        onLoad: () => {
         },
         dispatch,
       });

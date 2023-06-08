@@ -51,6 +51,7 @@ const Data = ({
             selectedNodeId,
             onChange: (changedData:any) => {
               const newData = structuredClone(versionData);
+              // TODO: this code viloted the DRY principle
               newData.checkpoints.forEach((v:ICheckPoint, index:number) => {
                 if (v.id === selectedNodeId) {
                   newData.checkpoints[index].data = {
@@ -70,6 +71,9 @@ const Data = ({
                   }
                   if (changedData.triggers) {
                     newData.checkpoints[index].triggers = changedData.triggers;
+                  }
+                  if (changedData.duration) {
+                    newData.checkpoints[index].duration = changedData.duration;
                   }
                   newData.checkpoints[index].isEnd = changedData.isEnd === true;
                   if (changedData.isEnd === true) {

@@ -2,6 +2,7 @@ import { finishLoading, startLoading } from '../../redux/reducers/ui.reducer';
 
 const BASE_URL = 'https://decisiontree.herokuapp.com';
 
+// TODO: update redux
 export const create = async ({
   json, title, desc, onSuccess, onError = (error:any) => {
     console.error(error);

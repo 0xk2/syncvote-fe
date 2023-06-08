@@ -2,9 +2,10 @@ import {
   Button, Input, Space,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import { LockFilled, UnlockOutlined } from '@ant-design/icons';
+import { CommentOutlined, LockFilled, UnlockOutlined } from '@ant-design/icons';
 
 import { ICheckPoint } from '../../../types';
+import { getVoteMachine } from '../voteMachine';
 
 const ContextTab = ({
   selectedNode = {}, onChange, editable,
@@ -13,6 +14,10 @@ const ContextTab = ({
   onChange: (changedData:ICheckPoint) => void;
   editable?: boolean;
 }) => {
+  const summary = getVoteMachine(selectedNode.vote_machine_type)?.explain({
+    checkpoint: selectedNode,
+    data: selectedNode.data,
+  });
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
   return (
     <Space direction="vertical" size="large" className="w-full">
@@ -61,6 +66,21 @@ const ContextTab = ({
           disabled={locked.description}
         />
       </Space>
+      {!selectedNode?.isEnd && selectedNode.vote_machine_type ?
+      (
+        <Space direction="vertical" className="p-4 rounded-md bg-slate-100 border-1 w-full">
+          <div className="flex items-center text-lg font-bold">
+            <CommentOutlined className="mr-2" />
+            Summary
+          </div>
+          {
+            summary
+          }
+        </Space>
+      )
+      :
+        <></>
+      }
     </Space>
   );
 };

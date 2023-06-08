@@ -17,7 +17,6 @@ const RulesTab = ({
   editable?: boolean;
   vmConfigPanel: JSX.Element;
 }) => {
-  const duration = selectedNode?.data?.duration;
   const [vmDrawerVisbibility, setvmDrawerVisbibility] = useState(false);
   const setVoteMachine = ({
     type, initialData,
@@ -99,7 +98,6 @@ const RulesTab = ({
                 key: '3',
                 label: 'Voting Duration',
                 children: <VotingDuration
-                  duration={duration}
                   onChange={onChange}
                   editable={editable}
                   selectedNode={selectedNode}

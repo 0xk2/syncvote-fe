@@ -1,7 +1,9 @@
-import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import {
+  finishLoading, setWeb2Integrations, startLoading, initialize,
+  deleteWeb2Integration as deleteWeb2IntegrationReducer,
+} from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
 
-// TODO: should update redux state in here
 export const queryWeb2Integration = async ({
   orgId, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -37,12 +39,14 @@ export const queryWeb2Integration = async ({
         },
       });
     }
+    // TODO: is newData follow the interface?
+    dispatch(setWeb2Integrations(newData));
+    dispatch(initialize({}));
     onLoad(newData);
   } else if (error) {
     onError(error);
   }
 };
-// TODO: should update redux state in here
 export const deleteWeb2Integration = async ({
   id, onLoad, onError = (error) => {
     console.error(error); // eslint-disable-line
@@ -56,6 +60,7 @@ export const deleteWeb2Integration = async ({
   dispatch(startLoading({}));
   const { data, error } = await supabase.from('web2_key').delete().eq('id', id);
   dispatch(finishLoading({}));
+  dispatch(deleteWeb2IntegrationReducer({ id }));
   if (!error) {
     onLoad(data);
   } else {

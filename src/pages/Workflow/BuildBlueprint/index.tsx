@@ -1,24 +1,21 @@
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@components/Button/Button';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { CodeOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import Input from '@components/Input/Input';
-import { JsonSchemaViewer } from '@stoplight/json-schema-viewer';
 import SaveIcon from '@assets/icons/svg-icons/SaveIcon';
 import Icon from '@components/Icon/Icon';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading, changeWorkflow } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
-import DirectedGraph from '@components/DirectedGraph/DirectedGraph';
+import { DirectedGraph } from '@components/DirectedGraph';
 
 const env = import.meta.env.VITE_EVN;
 
-type Props = {};
-
-const BuildBlueprint = (props: Props) => {
+const BuildBlueprint = () => {
   // document.title = 'Create new Workflow';
   const navigate = useNavigate();
   const dispatch = useDispatch();

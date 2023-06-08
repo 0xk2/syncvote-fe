@@ -4,20 +4,20 @@ import {
 } from 'antd';
 
 const VotingDuration = ({
-  duration, selectedNode,
+  selectedNode,
   onChange, editable,
 }:{
-  duration: number;
   selectedNode: any;
   onChange: (data:any) => void;
   editable: boolean;
 }) => {
+  const duration = selectedNode?.duration || 0;
   const days = duration ? Math.floor(duration / 86400) : 0;
   const mins = duration ? Math.floor((duration % 86400) / 60) : 0;
   const seconds = duration ? duration % 60 : 0;
   const dateChange = (durationChanged:number) => {
     const node = structuredClone(selectedNode);
-    node.data.duration = durationChanged;
+    node.duration = durationChanged;
     onChange(node);
   };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};

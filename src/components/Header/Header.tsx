@@ -16,6 +16,7 @@ import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import { Avatar, Button } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 
 type HeaderProps = {
   // isAuth: boolean;
@@ -161,7 +162,12 @@ function Header({
           ) : (
             <div
               className="border-b_2 py-3 px-4 my-3 mr-0 rounded-lg border-gray-normal  cursor-pointer"
-              onClick={() => supabase.auth.signOut()}
+              onClick={async () => {
+                dispatch(startLoading({}));
+                await supabase.auth.signOut();
+                dispatch(finishLoading({}));
+                navigate(PAGE_ROUTES.LOGIN);
+              }}
               title={L('clickToLogout')}
             >
               <p className="text-text_2 text-[#252422]">

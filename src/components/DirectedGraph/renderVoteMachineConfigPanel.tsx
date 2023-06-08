@@ -4,7 +4,7 @@ import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
 import { getVoteMachine } from './voteMachine';
 import { IVoteMachine } from '../../types';
 
-const renderVoteMachineConfigPanel = ({
+export const renderVoteMachineConfigPanel = ({
   // TODO: change versionData to a better name
   versionData, selectedNodeId, onChange, onDelete, onClose, web2Integrations,
   editable = false,
@@ -82,5 +82,3 @@ const renderVoteMachineConfigPanel = ({
     </Drawer>
   );
 };
-
-export default renderVoteMachineConfigPanel;

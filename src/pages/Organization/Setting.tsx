@@ -5,9 +5,6 @@ import { Tabs } from 'antd';
 import { deleteWeb2Integration, queryWeb2Integration } from '@utils/data';
 import { useParams } from 'react-router-dom';
 import { extractIdFromIdString } from '@utils/helpers';
-import {
-  setWeb2Integrations,
-} from '@redux/reducers/ui.reducer';
 import { IIntegration } from './interface';
 import Member from './setting/Member';
 import Integration from './setting/Integration';
@@ -22,8 +19,6 @@ const Setting = () => {
     queryWeb2Integration({
       orgId: extractIdFromIdString(orgIdString),
       onLoad: (data) => {
-        // TODO: move all redux to utils/data
-        dispatch(setWeb2Integrations(data));
         setIntegrations(data);
       },
       dispatch,

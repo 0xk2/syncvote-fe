@@ -2,19 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PAGE_ROUTES } from '@utils/constants/pageRoutes';
 import { useSelector, useDispatch } from 'react-redux';
-import { queryWeb2Integration, queryWorkflow } from '@utils/data';
+import { queryWeb2Integration, queryWorkflow, upsertWorkflowVersion } from '@utils/data';
 import { createIdString, extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import Meta from 'antd/es/card/Meta';
 import {
   Avatar, Card, Modal, Switch, Input as AntdInput, Button, Space,
 } from 'antd';
-import {
-  finishLoading, setWorkflows, startLoading, initialize, setWeb2Integrations,
-} from '@redux/reducers/ui.reducer';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import Input from '@components/Input/Input';
-import { supabase } from '@utils/supabaseClient';
 import {
   CodeOutlined, PlusOutlined, SaveOutlined, StarFilled, StarOutlined,
 } from '@ant-design/icons';
@@ -79,18 +75,13 @@ const BluePrint = () => {
       queryWorkflow({
         orgId,
         onLoad: (data) => {
-          dispatch(setWorkflows(data));
           extractWorkflowFromList(data);
-          dispatch(initialize({}));
         },
         dispatch,
       });
       queryWeb2Integration({
         orgId,
         onLoad: (data) => {
-          // TODO: move all redux to utils/data
-          dispatch(setWeb2Integrations(data));
-          dispatch(initialize({}));
           setWeb2IntegrationsState(data);
         },
         dispatch,
@@ -118,37 +109,38 @@ const BluePrint = () => {
     setNewFrmShown(false);
   };
   const handleSave = async () => {
-    dispatch(startLoading({}));
-    const { data, error } = await supabase.from('workflow_version').upsert({
-      id: versionId !== -1 ? versionId : undefined,
-      workflow_id: workflow.id,
-      version: versionTitle,
-      status: versionStatus,
-      data: versionData,
-      recommended: versionRecommended,
-    }).select();
-    dispatch(finishLoading({}));
+    await upsertWorkflowVersion({
+      dispatch,
+      workflowVersion: {
+        versionId,
+        workflowId: workflow.id,
+        version: versionTitle,
+        status: versionStatus,
+        versionData,
+        recommended: versionRecommended,
+      },
+      onSuccess: () => {
+        queryWorkflow({
+          orgId,
+          onLoad: (_data:any) => {
+            extractWorkflowFromList(_data);
+          },
+          dispatch,
+        });
+        Modal.success({
+          maskClosable: true,
+          content: 'Data submit successfully',
+        });
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error.message,
+        });
+      },
+    });
     setOpen(false);
     // clearSelectedVersion();
-    if (data) {
-      queryWorkflow({
-        orgId,
-        onLoad: (_data:any) => {
-          dispatch(setWorkflows(_data));
-          extractWorkflowFromList(_data);
-        },
-        dispatch,
-      });
-      Modal.success({
-        maskClosable: true,
-        content: 'Data submit successfully',
-      });
-    } else {
-      Modal.error({
-        title: 'Error',
-        content: error.message,
-      });
-    }
   };
   return (
     <div className="container mx-auto relative">
@@ -271,6 +263,9 @@ const BluePrint = () => {
                       }
                       if (changedData.triggers) {
                         newData.checkpoints[index].triggers = changedData.triggers;
+                      }
+                      if (changedData.duration) {
+                        newData.checkpoints[index].duration = changedData.duration;
                       }
                       newData.checkpoints[index].isEnd = changedData.isEnd === true;
                       if (changedData.isEnd === true) {

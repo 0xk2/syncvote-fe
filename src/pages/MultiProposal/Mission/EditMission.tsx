@@ -7,9 +7,6 @@ import {
 import { extractIdFromIdString } from '@utils/helpers';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  initialize, setMissions, setWeb2Integrations,
-} from '@redux/reducers/ui.reducer'; // TODO: should it be setMissions???
 import { IMission } from '../../../types/mission';
 import { create } from '../../../utils/data/dash';
 
@@ -40,17 +37,12 @@ const EditMission = () => {
         missionId,
         onLoad: (data) => {
           setCurrentMission(data[0]);
-          dispatch(initialize({}));
-          dispatch(setMissions(data));
         },
         dispatch,
       });
       queryWeb2Integration({
         orgId,
         onLoad: (data) => {
-          // TODO: move all redux to utils/data
-          dispatch(setWeb2Integrations(data));
-          dispatch(initialize({}));
           setWeb2IntegrationsState(data);
         },
         dispatch,

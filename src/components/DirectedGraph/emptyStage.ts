@@ -18,11 +18,10 @@ const endNode: ICheckPoint = {
   data: {},
   isEnd: true,
 };
-const emptyStage = {
+export const emptyStage = {
   checkpoints: [
     rootCheckPoint,
     endNode,
   ],
   start: 'root',
 };
-export default emptyStage;

@@ -19,6 +19,7 @@ const Add = ({
   } = data;
   const [tmpTweet, setTmpTweet] = useState<string>('');
   return (
+    // TODO: inject editable here and hide conte area
     <Space direction="vertical" className="w-full" size="large">
       <Space direction="vertical" className="w-full flex justify-between" size="small">
         <div className="flex items-center">

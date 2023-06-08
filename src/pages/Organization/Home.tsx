@@ -5,11 +5,6 @@ import { resetBlueprint } from '@redux/reducers/blueprint.reducer';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createIdString, extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import { IOrgType } from '@redux/reducers/ui.reducer/interface';
-import {
-  changeOrg,
-  setWorkflows as setReducerWorkflows, setMissions as setReducerMissions,
-  setWeb2Integrations,
-} from '@redux/reducers/ui.reducer';
 import { Avatar, Modal, Card as AntCard } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
@@ -18,19 +13,7 @@ import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import {
   queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg,
 } from '@utils/data';
-
-interface IOrg {
-  id: number;
-  title: string;
-  desc: string;
-  icon_url: string;
-  banner_url: string;
-  preset_icon_url?: string;
-  preset_banner_url?: string;
-  org_type: string;
-  org_size: string;
-  role: string;
-}
+import { IOrg } from '../../types/org';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -58,32 +41,20 @@ const HomePage = () => {
     setCurrentOrg(orgs[idx]);
     queryWeb2Integration({
       orgId,
-      onLoad: (data) => {
-        // TODO: move all of this to utils/data
-        dispatch(setWeb2Integrations(data));
+      onLoad: () => {
       },
       dispatch,
     });
     queryWorkflow({
       orgId,
       onLoad: (data) => {
-        dispatch(setReducerWorkflows(data));
         setWorkflows(data);
       },
       dispatch,
     });
     queryMission({
       orgId,
-      onLoad: (data) => {
-        const newMissions:IOrg[] = [];
-        data.forEach((d:IOrg) => {
-          const newd = { ...d };
-          newd.icon_url = d.icon_url ? d.icon_url : `preset:${d.preset_icon_url}`;
-          delete newd.preset_icon_url;
-          delete newd.preset_banner_url;
-          newMissions.push(newd);
-        });
-        dispatch(setReducerMissions(newMissions));
+      onLoad: (newMissions) => {
         setMissions(newMissions);
       },
       dispatch,
@@ -100,35 +71,13 @@ const HomePage = () => {
               ...currentOrg,
               ...obj,
             },
-            onLoad: (data) => {
-              dispatch(changeOrg({
-                ...currentOrg,
-                ...data[0],
-              }));
+            onLoad: () => {
             },
             dispatch,
           });
         }}
       />
       <div className="container mx-auto relative">
-        {/* <SliderCard
-          cardTitle={CARD_TYPE.INITIATIVE}
-          cardType={ECardEnumType.INITIATIVE}
-          amount={8}
-          dataCard={dataInitiativeCards}
-        /> */}
-        {/* <SliderCard
-          cardTitle={CARD_TYPE.PROPOSAL}
-          cardType={ECardEnumType.PROPOSAL}
-          amount={9}
-          dataCard={dataProposalCards}
-        /> */}
-        {/* <SliderCard
-          cardTitle={CARD_TYPE.BLUEPRINT}
-          cardType={ECardEnumType.BLUEPRINT}
-          amount={12}
-          dataCard={dataBluePrintCards}
-        /> */}
         <div className="relative my-[50px] cursor-pointer">
           <div className="flex items-center mb-10 container justify-between">
             <div className="text-gray-title font-semibold text-text_5 pl-1.5 flex flex-row items-center">

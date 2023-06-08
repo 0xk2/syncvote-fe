@@ -1,7 +1,7 @@
 import { MarkerType, Position } from 'reactflow';
 import SelfConnectingEdge from './SelfConnectingEdge';
 import MultipleDiretionNode from './MultipleDiretionNode';
-import emptyStage from './emptyStage';
+import { emptyStage } from './emptyStage';
 import { getVoteMachine } from './voteMachine';
 import { IVoteMachine } from '../../types';
 import BezierCustomEdge from './BezierCustomEdge';

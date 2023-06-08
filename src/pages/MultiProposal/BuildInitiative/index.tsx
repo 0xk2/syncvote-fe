@@ -26,8 +26,7 @@ const BuildInitiative = () => {
   if (allWorkflows.length === 0 && ui.initialized === false) {
     queryWorkflow({
       orgId,
-      onLoad: (data) => {
-        dispatch(setWorkflows(data));
+      onLoad: () => {
         dispatch(initialize(true));
       },
       dispatch,

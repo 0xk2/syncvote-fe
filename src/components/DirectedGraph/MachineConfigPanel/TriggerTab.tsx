@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Twitter from '../Enforcer/Twitter';
 import Fake from '../Enforcer/Fake';
+import TriggerEmptyStage from './TriggerEmptyStage';
 
 interface ITrigger {
   id: string,
@@ -80,82 +81,96 @@ const TriggerTab = ({
   });
   return (
     <Space direction="vertical" className="w-full" size="large">
-      <Collapse>
-        {
-          triggers.map(
-            (trigger:ITrigger, index: number) => {
-              const display = getProvider(trigger.provider).Display;
-              return (
-                <Collapse.Panel
-                  header={
-                    (
-                      <Paragraph
-                        style={{ marginBottom: '0px' }}
-                        editable={{
-                          onChange: (name) => {
+      {!triggers || triggers.length === 0 ? (
+        <TriggerEmptyStage
+          onClick={() => {
+            setShowAddTriggerDrawer(true);
+          }}
+          editable={editable}
+        />
+      )
+      :
+      (
+        <>
+          <Collapse>
+            {
+              triggers.map(
+                (trigger:ITrigger, index: number) => {
+                  const display = getProvider(trigger.provider).Display;
+                  return (
+                    <Collapse.Panel
+                      header={
+                        (
+                          <Paragraph
+                            style={{ marginBottom: '0px' }}
+                            editable={{
+                              onChange: (name) => {
+                                const newTriggers = [...triggers];
+                                newTriggers[index].name = name;
+                                onChange({
+                                  ...selectedNode,
+                                  triggers: newTriggers,
+                                });
+                              },
+                            }}
+                          >
+                            {trigger.name}
+                          </Paragraph>
+                        )
+                      }
+                      key={trigger.id || Math.random()}
+                      extra={(
+                        <Space direction="horizontal" size="middle">
+                          <Button
+                            icon={<DeleteOutlined />}
+                            className="text-red-500"
+                            onClick={() => {
+                              const tmpSelectedNode = structuredClone(selectedNode);
+                              const tmpTriggers = [...triggers];
+                              tmpTriggers.splice(index, 1);
+                              onChange({
+                                ...tmpSelectedNode,
+                                triggers: tmpTriggers,
+                              });
+                            }}
+                            disabled={!editable}
+                          />
+                        </Space>
+                      )}
+                    >
+                      <div>
+                        {display({
+                          data: {
+                            ...trigger, allNodes,
+                          },
+                          onChange: (data) => {
                             const newTriggers = [...triggers];
-                            newTriggers[index].name = name;
+                            newTriggers[index] = data;
                             onChange({
                               ...selectedNode,
                               triggers: newTriggers,
                             });
                           },
-                        }}
-                      >
-                        {trigger.name}
-                      </Paragraph>
-                    )
-                  }
-                  key={trigger.id || Math.random()}
-                  extra={(
-                    <Space direction="horizontal" size="middle">
-                      <Button
-                        icon={<DeleteOutlined />}
-                        className="text-red-500"
-                        onClick={() => {
-                          const tmpSelectedNode = structuredClone(selectedNode);
-                          const tmpTriggers = [...triggers];
-                          tmpTriggers.splice(index, 1);
-                          onChange({
-                            ...tmpSelectedNode,
-                            triggers: tmpTriggers,
-                          });
-                        }}
-                        disabled={!editable}
-                      />
-                    </Space>
-                  )}
-                >
-                  <div>
-                    {display({
-                      data: {
-                        ...trigger, allNodes,
-                      },
-                      onChange: (data) => {
-                        const newTriggers = [...triggers];
-                        newTriggers[index] = data;
-                        onChange({
-                          ...selectedNode,
-                          triggers: newTriggers,
-                        });
-                      },
-                    })}
-                  </div>
-                </Collapse.Panel>
-              );
-            },
-        )}
-      </Collapse>
-      <Button
-        type="default"
-        className="w-full"
-        onClick={() => {
-          setShowAddTriggerDrawer(true);
-        }}
-        disabled={!editable}
-      >
-        Add Trigger
-      </Button>
+                        })}
+                      </div>
+                    </Collapse.Panel>
+                  );
+                },
+            )}
+          </Collapse>
+          <Button
+            type="default"
+            className="w-full"
+            onClick={() => {
+              setShowAddTriggerDrawer(true);
+            }}
+            disabled={!editable}
+          >
+            Add Trigger
+          </Button>
+        </>
+      )
+      }
       <Drawer
         open={showAddTriggerDrawer}
         title="Add Trigger"

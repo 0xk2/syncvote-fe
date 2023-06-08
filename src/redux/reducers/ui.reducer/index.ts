@@ -127,6 +127,12 @@ const globalUISlice = createSlice({
         state.web2Integrations[index] = action.payload;
       }
     },
+    deleteWeb2Integration: (state, action) => {
+      const index = state.web2Integrations.findIndex((t:any) => t.id === action.payload.id);
+      if (index !== -1) {
+        state.web2Integrations.splice(index, 1);
+      }
+    },
     reset: (state, action) => {
       state.orgs = [];
       state.workflows = [];
@@ -165,6 +171,7 @@ export const {
   changeTemplate,
   setWeb2Integrations,
   changeWeb2Integration,
+  deleteWeb2Integration,
   initialize,
 } = globalUISlice.actions;
 export default globalUISlice.reducer;
