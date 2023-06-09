@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PAGE_ROUTES } from '@utils/constants/pageRoutes';
 import { useSelector, useDispatch } from 'react-redux';
-import { queryWeb2Integration, queryWorkflow, upsertWorkflowVersion } from '@utils/data';
+import { queryWeb2Integration, queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
 import { createIdString, extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import Meta from 'antd/es/card/Meta';
 import {
@@ -19,8 +19,8 @@ import {
   renderVoteMachineConfigPanel,
   getVoteMachine,
   emptyStage,
-  ICheckPoint,
 } from '@components/DirectedGraph';
+import { changeVersion } from '@middleware/logic';
 
 const { TextArea } = AntdInput;
 
@@ -243,42 +243,8 @@ const BluePrint = () => {
                 versionData,
                 selectedNodeId,
                 onChange: (changedData:any) => {
-                  const newData = structuredClone(versionData);
-                  newData.checkpoints.forEach((v:ICheckPoint, index:number) => {
-                    if (v.id === selectedNodeId) {
-                      newData.checkpoints[index].data = {
-                        ...changedData.data,
-                      };
-                      if (changedData.children) {
-                        newData.checkpoints[index].children = changedData.children;
-                      }
-                      if (changedData.title) {
-                        newData.checkpoints[index].title = changedData.title;
-                      }
-                      if (changedData.description) {
-                        newData.checkpoints[index].description = changedData.description;
-                      }
-                      if (changedData.locked) {
-                        newData.checkpoints[index].locked = changedData.locked;
-                      }
-                      if (changedData.triggers) {
-                        newData.checkpoints[index].triggers = changedData.triggers;
-                      }
-                      if (changedData.duration) {
-                        newData.checkpoints[index].duration = changedData.duration;
-                      }
-                      newData.checkpoints[index].isEnd = changedData.isEnd === true;
-                      if (changedData.isEnd === true) {
-                        newData.checkpoints[index].children = [];
-                        delete newData.checkpoints[index].vote_machine_type;
-                        delete newData.checkpoints[index].data;
-                      }
-                      if (changedData.vote_machine_type) {
-                        newData.checkpoints[index].vote_machine_type
-                        = changedData.vote_machine_type;
-                        newData.checkpoints[index].data = changedData.data;
-                      }
-                    }
+                  const newData = changeVersion({
+                    versionData, selectedNodeId, changedCheckPointData: changedData,
                   });
                   setVersionData(newData);
                 },

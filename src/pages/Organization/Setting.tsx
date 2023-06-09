@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BoxPlotOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
 import { Tabs } from 'antd';
-import { deleteWeb2Integration, queryWeb2Integration } from '@utils/data';
+import { deleteWeb2Integration, queryWeb2Integration } from '@middleware/data';
 import { useParams } from 'react-router-dom';
 import { extractIdFromIdString } from '@utils/helpers';
 import { IIntegration } from './interface';

@@ -5,7 +5,7 @@ import { OrgPresetBanner, OrgSize, OrgType } from '@utils/constants/organization
 import Input from '@components/Input/Input';
 import Button from '@components/Button/Button';
 import { useDispatch } from 'react-redux';
-import { newOrg } from '@utils/data';
+import { newOrg } from '@middleware/data';
 
 const NewOrgFrm = ({ onSubmit }: {
   onSubmit: () => void;

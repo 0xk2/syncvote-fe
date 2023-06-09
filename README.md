@@ -69,6 +69,11 @@ $ npm run preview
 ├── README.md
 ```
 
+## Revamp note
+
+- Tearing down a building going from top to bottom!
+- Building new one going from bottom to top!
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

@@ -12,7 +12,7 @@ import { registerVoteMachine } from '@components/DirectedGraph';
 
 import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
 import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
-import { queryOrgs, queryPresetBanner, queryPresetIcon } from '@utils/data';
+import { queryOrgs, queryPresetBanner, queryPresetIcon } from '@middleware/data';
 
 function App() {
   // const [isAuth, setIsAuth] = useState(false);

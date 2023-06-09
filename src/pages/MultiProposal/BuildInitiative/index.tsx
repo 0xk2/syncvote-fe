@@ -7,7 +7,7 @@ import { checkNode } from '@redux/reducers/check-node.reducer';
 import { createIdString, extractIdFromIdString } from '@utils/helpers';
 import { Tag } from 'antd';
 import moment from 'moment';
-import { queryWorkflow } from '@utils/data';
+import { queryWorkflow } from '@middleware/data';
 import { initialize, setWorkflows } from '@redux/reducers/ui.reducer';
 
 const BuildInitiative = () => {

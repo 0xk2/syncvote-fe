@@ -12,7 +12,7 @@ import DataIcon from '@assets/icons/svg-icons/DataIcon';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import {
   queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg,
-} from '@utils/data';
+} from '@middleware/data';
 import { IOrg } from '../../types/org';
 
 const HomePage = () => {

@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { supabase } from '../../utils/supabaseClient';
 import {
   finishLoading, startLoading, addOrg, changeOrg, initialize, setOrgs,
 } from '../../redux/reducers/ui.reducer';

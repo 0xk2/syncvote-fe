@@ -1,6 +1,6 @@
 import {
   queryWorkflow, upsertAMission,
-} from '@utils/data';
+} from '@middleware/data';
 import { createIdString, extractIdFromIdString } from '@utils/helpers';
 import { Modal, Space, Button } from 'antd';
 import { useEffect, useState } from 'react';

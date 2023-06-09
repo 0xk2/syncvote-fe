@@ -92,7 +92,11 @@ const RulesTab = ({
               {
                 key: '2',
                 label: 'Voting participants',
-                children: <VotingPartipation />,
+                children: <VotingPartipation
+                  onChange={onChange}
+                  editable={editable}
+                  selectedNode={selectedNode}
+                />,
               },
               {
                 key: '3',

@@ -1,5 +1,5 @@
 import {
-  changeMission, finishLoading, initialize, setWorkflows, startLoading,
+  finishLoading, initialize, setWorkflows, startLoading,
 } from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
 
@@ -35,8 +35,7 @@ export const upsertWorkflowVersion = async ({
   }).select();
   dispatch(finishLoading({}));
   if (data) {
-    // TODO: is the data match the interface?
-    dispatch(changeMission(data[0]));
+    // TODO: should we store workflow_version in redux?
     onSuccess(data);
   } else {
     onError(error);
@@ -54,6 +53,7 @@ export const queryWorkflow = async ({
   filter?: any;
 }) => {
   dispatch(startLoading({}));
+  // TODO: should we stuff workflow_version into workflow?
   const { data, error } = await supabase.from('workflow').select('*, workflow_version ( * )').eq('owner_org_id', orgId).order('created_at', { ascending: false });
   dispatch(finishLoading({}));
   if (data) {

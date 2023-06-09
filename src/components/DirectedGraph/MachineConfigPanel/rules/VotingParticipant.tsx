@@ -1,55 +1,99 @@
+import { ICheckPoint, IToken } from '@types';
 import { Select, Space } from 'antd';
+import AllowedByIdentity from './fragment/AllowedByIdentity';
+import AllowedByToken from './fragment/AllowedByToken';
 
-const VotingPartipation = () => {
+const VotingPartipation = ({
+  selectedNode, onChange, editable,
+}: {
+  selectedNode: ICheckPoint,
+  onChange: (changeData: any) => void,
+  editable: boolean,
+}) => {
+  const { participation } = selectedNode;
+  const type = participation?.type;
+  const data = participation?.data;
+  const identity = type === 'identity' && data ? data as string[] : [];
+  const tokenData = type === 'token' && data ? data as IToken : {};
   return (
     <Space direction="vertical" size="large" className="w-full">
       <Space direction="vertical" size="small" className="w-full">
-        <div className="text-lg font-bold">Wallet or token whitelist</div>
-        <div className="text-sm">User must either stay in a whitelist or has some token</div>
+        <div className="text-sm">Allowed by</div>
+        <Select
+          disabled={!editable}
+          value={type}
+          style={{ width: '100%' }}
+          onChange={(value) => {
+            onChange({
+              participation: {
+                type: value,
+              },
+            });
+          }}
+          options={[
+            {
+              key: 'identity',
+              label: 'Identity',
+              value: 'identity',
+            },
+            // choosing this option would engage Votemachine
+            {
+              key: 'token',
+              label: 'Token',
+              value: 'token',
+            },
+          ]}
+        />
+        {
+          type === 'identity' ?
+          (
+            <AllowedByIdentity
+              editable={editable}
+              identity={identity}
+              setIdentity={(newIdentity: string[]) => {
+                onChange({
+                  participation: {
+                    type: 'identity',
+                    data: newIdentity,
+                  },
+                });
+              }}
+            />
+          ) : null
+        }
+        {
+          type === 'token' ?
+          (
+            <AllowedByToken
+              editable={editable}
+              address={tokenData?.address}
+              setAddress={(address: string) => {
+                onChange({
+                  participation: {
+                    type: 'token',
+                    data: {
+                      address,
+                      min: tokenData?.min,
+                    },
+                  },
+                });
+              }}
+              min={tokenData?.min}
+              setMin={(min: number) => {
+                onChange({
+                  participation: {
+                    type: 'token',
+                    data: {
+                      min,
+                      address: tokenData?.address,
+                    },
+                  },
+                });
+              }}
+            />
+          ) : null
+        }
       </Space>
-      <Select
-        style={{ width: '100%' }}
-        defaultValue="whitelist"
-        options={[
-          {
-            key: 'whitelist',
-            label: 'A lits of addresses',
-            value: 'whitelist',
-          },
-          // choosing this option would engage Votemachine
-          {
-            key: 'spl',
-            label: 'A SPL Token owner',
-            value: 'spl',
-          },
-          // choosing this option would engage Votemachine
-          {
-            key: 'erc20',
-            label: 'An ERC20 Token owner',
-            value: 'erc20',
-          },
-        ]}
-      />
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-lg font-bold">Voting Power Provider</div>
-        <div className="text-sm">Use the vote machine or use 3rd party</div>
-      </Space>
-      <Select
-        style={{ width: '100%' }}
-        defaultValue="default"
-        options={[
-          {
-            key: 'default',
-            label: 'Use voting power provided by voting program',
-            value: '',
-          },
-          {
-            key: 'a_system_owned_address',
-            label: 'Provide by SyncVote',
-            value: 'a_system_owned_address',
-          },
-        ]}
-      />
     </Space>
   );
 };

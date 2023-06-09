@@ -173,5 +173,6 @@ export const {
   changeWeb2Integration,
   deleteWeb2Integration,
   initialize,
+  changeWorkflowVersion,
 } = globalUISlice.actions;
 export default globalUISlice.reducer;

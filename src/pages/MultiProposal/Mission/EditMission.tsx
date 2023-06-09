@@ -3,12 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import {
   upsertAMission, deleteMission, queryAMission, queryWeb2Integration,
-} from '@utils/data';
+} from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IMission } from '../../../types/mission';
-import { create } from '../../../utils/data/dash';
+import { create } from '../../../middleware/data/dash';
 
 import MissionData from './fragments/MissionData';
 import MissionMeta from './fragments/MissionMeta';
