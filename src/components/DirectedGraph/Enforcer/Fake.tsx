@@ -69,7 +69,7 @@ const Display = ({
   const {
     key, value, allNodes, triggerAt,
   } = data;
-  const title = triggerAt === 'this' ? 'this' : allNodes.find((node:any) => node.id === triggerAt).title;
+  const title = triggerAt === 'this' ? 'the start' : allNodes.find((node:any) => node.id === triggerAt).title;
   return (
     <Space direction="vertical" size="small" className="w-full">
       <div className="flex items-center">
