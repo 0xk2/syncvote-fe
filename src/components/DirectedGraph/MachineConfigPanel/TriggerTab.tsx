@@ -1,13 +1,14 @@
 import { IIntegration } from '@pages/Organization/interface';
 import {
-  Button, Collapse, Drawer, Select, Space,
+  Button, Space,
 } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Twitter from '../Enforcer/Twitter';
 import Fake from '../Enforcer/Fake';
-import TriggerEmptyStage from './TriggerEmptyStage';
+import TriggerEmptyStage from './triggers/TriggerEmptyStage';
+import NewTriggerDrawer from './triggers/NewTriggerDrawer';
 
 interface ITrigger {
   id: string,
@@ -54,20 +55,14 @@ const TriggerTab = ({
   const options = web2Integrations?.map((integration:IIntegration) => {
     return {
       id: integration.id,
-      label: `${integration.provider}:${integration.username}`,
+      label: integration.username !== ' ' ? `${integration.provider} (${integration.username})` : integration.provider,
       value: integration.id,
     };
   });
   const selectedIntegration = web2Integrations?.find(
     (integration) => integration.id === selectedIntegrationId);
   const AddElement = getProvider(selectedIntegration?.provider || '').Add;
-  const triggerAtOptions = [
-    {
-      id: 'this',
-      label: 'This checkpoint started',
-      value: 'this',
-    },
-  ];
+  const triggerAtOptions:any = [];
   children?.forEach((childId) => {
     let title = allNodes.find((n) => n.id === childId).title || childId;
     if (title.length > 20) {
@@ -92,72 +87,68 @@ const TriggerTab = ({
       :
       (
         <>
-          <Collapse>
+          <Space direction="vertical" size="middle" className="w-full">
             {
               triggers.map(
                 (trigger:ITrigger, index: number) => {
                   const display = getProvider(trigger.provider).Display;
                   return (
-                    <Collapse.Panel
-                      header={
-                        (
-                          <Paragraph
-                            style={{ marginBottom: '0px' }}
-                            editable={{
-                              onChange: (name) => {
-                                const newTriggers = [...triggers];
-                                newTriggers[index].name = name;
-                                onChange({
-                                  ...selectedNode,
-                                  triggers: newTriggers,
-                                });
-                              },
-                            }}
-                          >
-                            {trigger.name}
-                          </Paragraph>
-                        )
-                      }
+                    <Space
+                      direction="vertical"
+                      size="small"
+                      className="rounded-md border-2 p-4 w-full"
                       key={trigger.id || Math.random()}
-                      extra={(
-                        <Space direction="horizontal" size="middle">
-                          <Button
-                            icon={<DeleteOutlined />}
-                            className="text-red-500"
-                            onClick={() => {
-                              const tmpSelectedNode = structuredClone(selectedNode);
-                              const tmpTriggers = [...triggers];
-                              tmpTriggers.splice(index, 1);
-                              onChange({
-                                ...tmpSelectedNode,
-                                triggers: tmpTriggers,
-                              });
-                            }}
-                            disabled={!editable}
-                          />
-                        </Space>
-                      )}
                     >
-                      <div>
-                        {display({
-                          data: {
-                            ...trigger, allNodes,
-                          },
-                          onChange: (data) => {
-                            const newTriggers = [...triggers];
-                            newTriggers[index] = data;
+                      <Space direction="horizontal" className="w-full flex justify-between">
+                        <Paragraph
+                          style={{ marginBottom: '0px' }}
+                          className="text-lg font-semibold flex items-center"
+                          editable={{
+                            onChange: (name) => {
+                              const newTriggers = [...triggers];
+                              newTriggers[index].name = name;
+                              onChange({
+                                ...selectedNode,
+                                triggers: newTriggers,
+                              });
+                            },
+                          }}
+                        >
+                          {trigger.name}
+                        </Paragraph>
+                        <Button
+                          icon={<DeleteOutlined />}
+                          className="text-red-500"
+                          onClick={() => {
+                            const tmpSelectedNode = structuredClone(selectedNode);
+                            const tmpTriggers = [...triggers];
+                            tmpTriggers.splice(index, 1);
                             onChange({
-                              ...selectedNode,
-                              triggers: newTriggers,
+                              ...tmpSelectedNode,
+                              triggers: tmpTriggers,
                             });
-                          },
-                        })}
-                      </div>
-                    </Collapse.Panel>
+                          }}
+                          disabled={!editable}
+                        />
+                      </Space>
+                      {display({
+                        data: {
+                          ...trigger, allNodes,
+                        },
+                        onChange: (data) => {
+                          const newTriggers = [...triggers];
+                          newTriggers[index] = data;
+                          onChange({
+                            ...selectedNode,
+                            triggers: newTriggers,
+                          });
+                        },
+                      })}
+                    </Space>
                   );
                 },
             )}
-          </Collapse>
+          </Space>
           <Button
             type="default"
             className="w-full"
@@ -171,65 +162,21 @@ const TriggerTab = ({
         </>
       )
       }
-      <Drawer
-        open={showAddTriggerDrawer}
-        title="Add Trigger"
-        onClose={() => {
-          setShowAddTriggerDrawer(false);
-        }}
-      >
-        <Space direction="vertical" className="w-full" size="large">
-          <Select
-            options={options}
-            value={selectedIntegrationId}
-            onChange={(value) => {
-              setSelectedIntegrationId(value);
-            }}
-            className="w-full"
-          />
-          {selectedIntegrationId ?
-          (
-            <Space direction="vertical" className="w-full" size="small">
-              <div>Trigger when</div>
-              <Select
-                options={triggerAtOptions}
-                className="w-full"
-                value={selectedTriggerAt}
-                onChange={(value) => {
-                  setSelectedTriggerAt(value);
-                }}
-              />
-              <AddElement
-                data={selectedIntegration}
-                onChange={(data:any) => {
-                  const tmpData = structuredClone(data);
-                  const tmpSelectedNode = structuredClone(selectedNode);
-                  tmpData.integrationId = selectedIntegrationId;
-                  delete tmpData.id;
-                  delete tmpData.access_token;
-                  delete tmpData.refresh_token;
-                  delete tmpData.refresh_token_expires_at;
-                  delete tmpData.created_at;
-                  delete tmpData.scope;
-                  delete tmpData.updated_at;
-                  onChange({
-                    ...tmpSelectedNode,
-                    triggers: [...triggers, {
-                      provider: selectedIntegration?.provider,
-                      name: `Trigger#${triggers.length + 1}`,
-                      triggerAt: selectedTriggerAt,
-                      ...tmpData,
-                    }],
-                  });
-                  setShowAddTriggerDrawer(false);
-                }}
-              />
-            </Space>
-          )
-          :
-          null}
-        </Space>
-      </Drawer>
+      <NewTriggerDrawer
+        selectedNode={selectedNode}
+        triggers={triggers}
+        onChange={onChange}
+        options={options}
+        AddElement={AddElement}
+        selectedIntegrationId={selectedIntegrationId}
+        setSelectedIntegrationId={setSelectedIntegrationId}
+        showAddTriggerDrawer={showAddTriggerDrawer}
+        setShowAddTriggerDrawer={setShowAddTriggerDrawer}
+        selectedIntegration={selectedIntegration}
+        setSelectedTriggerAt={setSelectedTriggerAt}
+        selectedTriggerAt={selectedTriggerAt}
+        triggerAtOptions={triggerAtOptions}
+      />
     </Space>
   );
 };

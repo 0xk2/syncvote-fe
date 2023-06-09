@@ -1,4 +1,4 @@
-import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { FlagOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import {
   Button, Input, Space, Tag,
 } from 'antd';
@@ -72,10 +72,18 @@ const Display = ({
   const title = triggerAt === 'this' ? 'this' : allNodes.find((node:any) => node.id === triggerAt).title;
   return (
     <Space direction="vertical" size="small" className="w-full">
-      <Space direction="horizontal" size="middle" className="w-full flex items-center">
-        <Tag>
-          {key}
-        </Tag>
+      <div className="flex items-center">
+        <FlagOutlined className="mr-2" />
+        Trigger action at
+        <Tag className="mx-2">{title}</Tag>
+      </div>
+      <Space direction="vertical" size="middle" className="w-full flex">
+        <Space direction="horizontal" size="small">
+          <SettingOutlined />
+          <Tag>
+            {key}
+          </Tag>
+        </Space>
         <Paragraph
           className="w-full"
           style={{ marginBottom: '0px' }}
@@ -88,10 +96,6 @@ const Display = ({
           {value}
         </Paragraph>
       </Space>
-      <div>
-        <Tag className="mr-2">Trigger at</Tag>
-        {title}
-      </div>
     </Space>
   );
 };
