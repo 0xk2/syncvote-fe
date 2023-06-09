@@ -352,6 +352,34 @@ const explain = ({
   );
 };
 
+const validate = ({
+  checkpoint //eslint-disable-line
+}: {
+  checkpoint: ICheckPoint,
+}) => {
+  let isValid = true;
+  const message = [];
+  if (!checkpoint.children || checkpoint.children.length === 0) {
+    isValid = false;
+    message.push('Missing options');
+  }
+  if (!checkpoint.data.upTo) {
+    message.push('Missing number of vote user can choose up to');
+  }
+  if (!checkpoint.data.max) {
+    message.push('Missing number of vote an option must meet to be elected');
+  }
+  if (!checkpoint.data.next) {
+    message.push('Missing CheckPoint to redirect if this vote is passed');
+  }
+  if (!checkpoint.data.fallback) {
+    message.push('Missing CheckPoint to redirect if this vote can not be decided');
+  }
+  return {
+    isValid, message,
+  };
+};
+
 const VoteMachine : IVoteMachine = {
   ConfigPanel,
   getProgramAddress,
@@ -362,6 +390,7 @@ const VoteMachine : IVoteMachine = {
   getIcon,
   getInitialData,
   explain,
+  validate,
 };
 
 export default VoteMachine;

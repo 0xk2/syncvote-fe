@@ -1,3 +1,4 @@
+import { ICheckPoint } from '@types';
 import { IData } from './interface';
 
 export const getName = () => {
@@ -34,4 +35,24 @@ export const getInitialData = () => {
     token: '',
   };
   return data;
+};
+
+export const validate = ({
+  checkpoint //eslint-disable-line
+}: {
+  checkpoint: ICheckPoint,
+}) => {
+  let isValid = true;
+  const message = [];
+  if (!checkpoint.children || checkpoint.children.length === 0) {
+    isValid = false;
+    message.push('Missing options');
+  }
+  if (!checkpoint.data || !checkpoint.data.max) {
+    isValid = false;
+    message.push('Missing number of vote need to win');
+  }
+  return {
+    isValid, message,
+  };
 };

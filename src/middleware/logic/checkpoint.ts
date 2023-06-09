@@ -48,3 +48,51 @@ export const changeVersion = ({
   }
   return newData;
 };
+
+export const validateWorkflow = ({ checkPoint }:{
+  checkPoint: ICheckPoint;
+}) => {
+  const message = [];
+  let isValid = true;
+  if (checkPoint.isEnd) {
+    // End checkPoint require no condition
+    isValid = true;
+  } else {
+    if (checkPoint.participation === undefined || checkPoint.participation?.data === undefined) {
+      isValid = false;
+      message.push('Missing voting participation condition');
+    }
+    if (checkPoint.vote_machine_type === undefined) {
+      isValid = false;
+      message.push('Missing voting machine type');
+    }
+    if (!checkPoint.duration) {
+      isValid = false;
+      message.push('Missing duration');
+    }
+    if (!checkPoint.data) {
+      isValid = false;
+      message.push('Vote configuration is missing');
+    }
+  }
+  return {
+    isValid, message,
+  };
+};
+
+export const validateMission = ({ checkPoint }:{
+  checkPoint: ICheckPoint;
+}) => {
+  let message = '';
+  let isValid = true;
+  if (checkPoint.isEnd) {
+    // End checkPoint require no condition
+    isValid = true;
+  } else {
+    isValid = true;
+    message = 'nothing has been done';
+  }
+  return {
+    isValid, message,
+  };
+};

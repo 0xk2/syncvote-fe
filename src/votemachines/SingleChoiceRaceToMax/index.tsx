@@ -12,7 +12,7 @@ import {
 } from '../../types';
 import {
   getProgramAddress as gpa, getName as gn, deleteChildNode as dcn, getType as gt,
-  getInitialData as gid,
+  getInitialData as gid, validate as v,
 } from './funcs';
 import cf from './ConfigPanel';
 import { IData } from './interface';
@@ -126,6 +126,7 @@ const VoteMachine : IVoteMachine = {
   getIcon,
   getInitialData: gid,
   explain,
+  validate: v,
 };
 
 export default VoteMachine;

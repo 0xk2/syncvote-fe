@@ -1,5 +1,6 @@
 import { ICheckPoint } from './checkpoint';
 
+// TODO: do we need this interface or the ICheckPoint interface is sufficient?
 export interface IVoteMachineConfigProps {
   editable: boolean,
   currentNodeId?: string,
@@ -18,7 +19,7 @@ export interface IVoteMachineConfigProps {
   * List of Solana Addresses
   * - If whitelist is empty then anyone can vote and votingPowerProvider decide the voting power
   * - If whitelist is not empty then only whitelisted addresses can vote
-  *   and votingPowerProvider decide the voting power
+  *   and votingPowerProvider decide the voting power.
   */
   whitelist?: string[],
 }
@@ -43,4 +44,9 @@ export interface IVoteMachine {
     checkpoint:ICheckPoint,
     data:any,
   }) => JSX.Element;
+  validate: ({
+    checkpoint,
+  } : {
+    checkpoint:ICheckPoint,
+  }) => { isValid: boolean, message: string[] } ;
 }

@@ -1,9 +1,12 @@
 import {
+  Alert,
   Button, Input, Space,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { CommentOutlined, LockFilled, UnlockOutlined } from '@ant-design/icons';
-
+import {
+  validateWorkflow, validateMission,
+} from '@middleware/logic';
 import { ICheckPoint } from '../../../types';
 import { getVoteMachine } from '../voteMachine';
 
@@ -18,7 +21,36 @@ const ContextTab = ({
     checkpoint: selectedNode,
     data: selectedNode.data,
   });
+  const vmValidation = getVoteMachine(selectedNode.vote_machine_type)?.validate({
+    checkpoint: selectedNode,
+  }) || {
+    isValid: true,
+  };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
+  let validation;
+  // TODO: change edible to workflow or mission state!
+  if (editable) { // this is workflow
+    validation = validateWorkflow({ checkPoint: selectedNode });
+  } else { // this is mission
+    validation = validateMission({ checkPoint: selectedNode });
+  }
+  const renderValidation = (params: any) => {
+    let rs = null;
+    if (!params.isValid) {
+      rs = (
+        <>
+          {
+            params.message.map((msg: string) => {
+              return (
+                <Alert key={msg} message={msg} type="error" />
+              );
+            })
+          }
+        </>
+      );
+    }
+    return rs;
+  };
   return (
     <Space direction="vertical" size="large" className="w-full">
       <Space.Compact className="w-full">
@@ -68,19 +100,25 @@ const ContextTab = ({
       </Space>
       {!selectedNode?.isEnd && selectedNode.vote_machine_type ?
       (
-        <Space direction="vertical" className="p-4 rounded-md bg-slate-100 border-1 w-full">
-          <div className="flex items-center text-lg font-bold">
-            <CommentOutlined className="mr-2" />
-            Summary
-          </div>
-          {
-            summary
-          }
-        </Space>
+        <>
+          <Space direction="vertical" className="p-4 rounded-md bg-slate-100 border-1 w-full">
+            <div className="flex items-center text-lg font-bold">
+              <CommentOutlined className="mr-2" />
+              Summary
+            </div>
+            {
+              summary
+            }
+          </Space>
+        </>
       )
       :
         <></>
       }
+      <Space direction="vertical" size="middle" className="w-full">
+        {renderValidation(validation)}
+        {renderValidation(vmValidation)}
+      </Space>
     </Space>
   );
 };

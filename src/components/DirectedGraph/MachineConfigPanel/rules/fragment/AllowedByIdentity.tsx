@@ -1,4 +1,5 @@
 import {
+  CloseCircleOutlined,
   CopyOutlined, DatabaseOutlined, DeleteOutlined, MoreOutlined, PlusOutlined,
 } from '@ant-design/icons';
 import {
@@ -108,6 +109,7 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
   const [addNewDrawerVisibility, setAddNewDrawerVisibility] = useState(false);
   return (
     <Space direction="vertical" size="middle" className="w-full">
+      <div className="text-sm">Allowed identity (email, twitter or wallet address)</div>
       <Space direction="vertical" size="small" className="w-full">
         {identity.map((id, index) => (
           <Space.Compact className="w-full" key={id}>
@@ -119,6 +121,14 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
                 newIdentity[index] = e.target.value;
                 setIdentity(newIdentity);
               }}
+              suffix={(
+                <CloseCircleOutlined onClick={() => {
+                  const newIdentity = [...identity];
+                  newIdentity.splice(index, 1);
+                  setIdentity(newIdentity);
+                }}
+                />
+              )}
             />
             <MoreButton
               txt={id}
