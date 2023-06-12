@@ -26,8 +26,9 @@ interface IFlow {
   edges?: any, // eslint-disable-line
   onViewPortChange?: (viewport:any) => void,
   editable?: boolean, // eslint-disable-line
+  navPanel?: JSX.Element, // eslint-disable-line
 }
-
+// TODO: should change editable to isWorkflow to reflect the real meaning
 const Flow = ({
   onNodeClick = () => {},
   onPaneClick = () => {},
@@ -38,6 +39,7 @@ const Flow = ({
   nodes,
   edges,
   editable = true,
+  navPanel = (<></>),
 }: IFlow) => {
   useOnViewportChange({
     onChange: useCallback((viewport: any) => {
@@ -59,14 +61,37 @@ const Flow = ({
       proOptions={proOptions}
       fitView
     >
-      <Controls />
+      <Controls
+        position={editable ? 'top-right' : 'top-left'}
+      />
       <Background color="#aaa" variant={BackgroundVariant.Dots} />
-      <Panel position="top-left">
-        <Space direction="horizontal">
-          <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
-          <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
-        </Space>
-      </Panel>
+      {
+        !editable ?
+        (
+          <Panel position="top-left">
+            <Space direction="horizontal">
+              <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
+              <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
+            </Space>
+          </Panel>
+        )
+        :
+        (
+          <>
+            <Panel position="top-left">
+              <Space direction="horizontal">
+                {navPanel}
+              </Space>
+            </Panel>
+            <Panel position="bottom-left">
+              <Space direction="horizontal">
+                <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
+                <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
+              </Space>
+            </Panel>
+          </>
+        )
+      }
     </ReactFlow>
   );
 };
@@ -80,6 +105,7 @@ export const DirectedGraph = ({
   onAddNewNode = () => {},
   onViewPortChange = () => {},
   editable = true,
+  navPanel = <></>,
 }: IFlow) => {
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -89,9 +115,11 @@ export const DirectedGraph = ({
     setEdges(obj.edges);
   }, [data, selectedNodeId]);
   return (
-    <div style={{
-      width: '100%', minWidth: '800px', height: '500px', backgroundColor: 'white',
+    <div
+      style={{
+        width: '100%', minWidth: '800px', backgroundColor: 'white',
       }}
+      className="h-full"
     >
       <ReactFlowProvider>
         <Flow
@@ -104,6 +132,7 @@ export const DirectedGraph = ({
           onAddNewNode={onAddNewNode}
           onViewPortChange={onViewPortChange}
           editable={editable}
+          navPanel={navPanel}
         />
       </ReactFlowProvider>
     </div>

@@ -8,6 +8,7 @@ export const upsertWorkflowVersion = async ({
   workflowVersion,
   onSuccess,
   onError = (error:any) => { console.error(error); }, // es-lint-disable-line
+  mode,
 }: {
   workflowVersion: {
     versionId: number;
@@ -20,19 +21,25 @@ export const upsertWorkflowVersion = async ({
   dispatch: any;
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
+  mode?: 'data' | 'info' | undefined,
 }) => {
   dispatch(startLoading({}));
   const {
     versionId, workflowId, version, status, versionData, recommended,
   } = workflowVersion;
-  const { data, error } = await supabase.from('workflow_version').upsert({
+  const toUpsert:any = {
     id: versionId !== -1 ? versionId : undefined,
     workflow_id: workflowId,
-    version,
-    status,
-    data: versionData,
-    recommended,
-  }).select();
+  };
+  if (!mode || mode === 'data') {
+    toUpsert.data = versionData;
+  }
+  if (!mode || mode === 'info') {
+    toUpsert.version = version;
+    toUpsert.status = status;
+    toUpsert.recommended = recommended;
+  }
+  const { data, error } = await supabase.from('workflow_version').upsert(toUpsert).select();
   dispatch(finishLoading({}));
   if (data) {
     // TODO: should we store workflow_version in redux?

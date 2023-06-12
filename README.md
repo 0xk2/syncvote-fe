@@ -73,6 +73,7 @@ $ npm run preview
 
 - Tearing down a building going from top to bottom!
 - Building new one going from bottom to top!
+- Dont abuse `component` folder to put all fragment, it complicate the code
 
 ## License
 

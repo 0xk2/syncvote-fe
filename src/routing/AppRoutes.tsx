@@ -42,11 +42,19 @@ import {
 } from '@pages/Organization';
 import CreatorLogin from '@pages/Authentication/creator';
 import BluePrint from '@pages/Workflow/BluePrint';
+import {
+  EditVersion, NewVersion,
+} from '@pages/Workflow/Version';
 import { NewMission, EditMission } from '@pages/MultiProposal/Mission';
 
 const AppRoutes = () => (
   <BrowserRouter basename={PAGE_ROUTES.ROOT}>
     <Routes>
+      <Route path={PAGE_ROUTES.ROOT} element={<App isFullHeight />}>
+        <Route path={PAGE_ROUTES.WORKFLOW.ROOT}>
+          <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<EditVersion />} />
+        </Route>
+      </Route>
       <Route path={PAGE_ROUTES.ROOT} element={<App />}>
         <Route path={`${PAGE_ROUTES.ORG_DETAIL}/:orgIdString`} element={<OrganizationHome />} />
         <Route path={`${PAGE_ROUTES.ORG_DETAIL}/:orgIdString/setting`} element={<OrganizationSetting />} />
@@ -58,7 +66,6 @@ const AppRoutes = () => (
         <Route path={PAGE_ROUTES.PROPOSAL_DETAIL} element={<ProposalDetail />} />
         <Route path={`${PAGE_ROUTES.PROPOSAL_DETAIL}/:id`} element={<VotingProposal />} />
         <Route path={`${PAGE_ROUTES.MULTI_PROPOSAL}/:id`} element={<MultiProposal />} />
-        {/* <Route path={PAGE_ROUTES.INITIATIVE_DETAIL} element={<ProposalDetail />} /> */}
         <Route path={PAGE_ROUTES.RESULT_VOTE} element={<ResultVote />} />
 
         <Route path={PAGE_ROUTES.INITIATIVE.ROOT} element={<Initiative />}>
@@ -85,7 +92,9 @@ const AppRoutes = () => (
 
         {/* <Route path={PAGE_ROUTES.WORKFLOW.ROOT} element={<BluePrint />}> */}
         <Route path={PAGE_ROUTES.WORKFLOW.ROOT}>
-          <Route path={`:orgIdString/${PAGE_ROUTES.WORKFLOW.EDIT}/:workflowId`} element={<BluePrint />} />
+          <Route path={`:orgIdString/${PAGE_ROUTES.WORKFLOW.EDIT}/:workflowIdString`} element={<BluePrint />} />
+          <Route path=":orgIdString/:workflowIdString/new" element={<NewVersion />} />
+          {/* <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<VersionDataEdit />} /> */}
           <Route path={`${PAGE_ROUTES.WORKFLOW.SELECT_TEMPLATE}/:orgIdString`} element={<BuildBlueprint />} />
           <Route path={PAGE_ROUTES.WORKFLOW.SET_NAME} element={<SetWfName />} />
           <Route path={PAGE_ROUTES.WORKFLOW.ADD_PRIMARY_CP} element={<AddPrimaryCheckpoints />} />

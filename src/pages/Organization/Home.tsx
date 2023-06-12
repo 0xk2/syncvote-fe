@@ -170,7 +170,7 @@ const HomePage = () => {
                     bordered
                     className="w-[300px] border-b_1 cursor-pointer hover:drop-shadow-lg"
                     onClick={() => {
-                      navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${PAGE_ROUTES.WORKFLOW.EDIT}/${w.id}`, { replace: true });
+                      navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${PAGE_ROUTES.WORKFLOW.EDIT}/${createIdString(w.title, w.id)}`, { replace: true });
                     }}
                   >
                     <Meta

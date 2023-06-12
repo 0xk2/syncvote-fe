@@ -14,7 +14,11 @@ import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
 import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
 import { queryOrgs, queryPresetBanner, queryPresetIcon } from '@middleware/data';
 
-function App() {
+function App({
+  isFullHeight = false,
+} : {
+  isFullHeight?: boolean,
+}) {
   // const [isAuth, setIsAuth] = useState(false);
   const navigate = useNavigate();
   // const token = window.localStorage.getItem('isConnectWallet');
@@ -60,14 +64,15 @@ function App() {
     registerVoteMachine(MultipleChoiceRaceToMax);
   }, []);
   return (
-    <div className="w-full">
+    <div className={`w-full ${isFullHeight ? 'bg-slate-100 h-screen' : null}`}>
       <GlobalLoading />
       <Header
         // isAuth={isAuth}
         // setIsAuth={setIsAuth}
         session={session}
+        isMainAppFullHeight={isFullHeight}
       />
-      <MainLayout>
+      <MainLayout isFullHeight={isFullHeight}>
         <Outlet
           context={{
             // isAuth,

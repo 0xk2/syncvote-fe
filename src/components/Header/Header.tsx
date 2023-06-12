@@ -22,6 +22,7 @@ type HeaderProps = {
   // isAuth: boolean;
   // setIsAuth: (value: boolean) => void;
   session: any;
+  isMainAppFullHeight: boolean;
 };
 
 enum Pages {
@@ -36,6 +37,7 @@ function Header({
   // isAuth = false,
   // setIsAuth = () => {},
   session,
+  isMainAppFullHeight = false,
 }: HeaderProps) {
   const params = useLocation();
   // const token = window.localStorage.getItem('isConnectWallet');
@@ -65,7 +67,7 @@ function Header({
     default: currentPage = Pages.UNKNOWN; break;
   }
   return (
-    <div className="flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans fixed top-0 left-0 z-20 bg-white">
+    <div className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white ${!isMainAppFullHeight ? 'fixed top-0 left-0' : null}`}>
       <div className=" w-full flex justify-between">
         <div className="flex p-0 gap-2 items-center">
           {currentPage !== Pages.LOGIN ?
