@@ -86,7 +86,7 @@ export const renderValidateStatus = (condition: AlertMessage | null) => {
 
 export const createIdString = (title:String, id:String) => {
   let result = '';
-  result = title.toLocaleLowerCase();
+  result = title.toLocaleLowerCase().replace(/([^\w ]|_)/g, '');
   result = result.split(' ').join('-');
   return `${result}-${id}`;
 };

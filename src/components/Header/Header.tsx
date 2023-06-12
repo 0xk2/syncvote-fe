@@ -120,7 +120,7 @@ function Header({
                           navigate(`${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
                         }}
                       >
-                        Home
+                        Governance
                       </Button>
                       <Button
                         type="text"
@@ -130,7 +130,7 @@ function Header({
                           navigate(`${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}/setting`);
                         }}
                       >
-                        Setting
+                        Settings
                       </Button>
                     </span>
                   )

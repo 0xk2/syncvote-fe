@@ -9,7 +9,7 @@ const emptyState = {
   status: 'DRAFT',
   recommended: false,
 };
-
+// TODO: forbid special character
 const EditInfo = ({
   info,
   onSave,

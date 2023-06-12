@@ -111,6 +111,7 @@ export const EditVersion = () => {
       <Drawer
         open={showInfoPanel}
         onClose={() => { setShowInfoPanel(false); }}
+        title="Edit Version Info"
       >
         <EditInfo
           info={version}

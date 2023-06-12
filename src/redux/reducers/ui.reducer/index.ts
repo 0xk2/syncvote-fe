@@ -63,7 +63,10 @@ const globalUISlice = createSlice({
       if (index === -1) {
         state.workflows.push(action.payload);
       } else {
-        state.workflows[index] = action.payload;
+        state.workflows[index] = {
+          ...state.workflows[index],
+          ...action.payload,
+        };
       }
     },
     deleteWorkflowVersion: (state, action) => {

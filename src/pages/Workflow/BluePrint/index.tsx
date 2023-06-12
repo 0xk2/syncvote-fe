@@ -2,17 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PAGE_ROUTES } from '@utils/constants/pageRoutes';
 import { useSelector, useDispatch } from 'react-redux';
-import { queryWorkflow } from '@middleware/data';
-import { createIdString, extractIdFromIdString, getImageUrl } from '@utils/helpers';
-import Meta from 'antd/es/card/Meta';
+import { queryWorkflow, updateAWorkflowInfo, upsertWorkflowVersion } from '@middleware/data';
+import { createIdString, extractIdFromIdString } from '@utils/helpers';
 import {
-  Avatar, Card, Button,
+  Card, Button, Space, Tag, Popover, Modal, Divider,
 } from 'antd';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
-import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import {
-  PlusOutlined, StarFilled, StarOutlined,
+  EditOutlined,
+  MoreOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
+import moment from 'moment';
+import Icon from '@components/Icon/Icon';
+import NewVersion from './fragment/NewVersion';
+import EditWorkflow from './fragment/EditWorkflow';
 
 const BluePrint = () => {
   const navigate = useNavigate();
@@ -28,16 +32,10 @@ const BluePrint = () => {
     icon_url: '',
     workflow_version: [],
   });
-  const extractWorkflowFromList = (list:any) => {
-    list.forEach((d:any) => {
-      if (d.id === workflowId) {
-        let isPreset = false;
-        isPreset = d.icon_url ? isPreset = d.icon_url.includes('preset') : false;
-        setWorkflow({
-          ...d,
-          icon_url: getImageUrl({ filePath: d.icon_url.replace('preset:', ''), isPreset, type: 'icon' }),
-        });
-      }
+  const extractWorkflowFromList = (list:any[]) => {
+    const wf = list.find((d:any) => d.id === workflowId);
+    setWorkflow({
+      ...wf,
     });
   };
   useEffect(() => {
@@ -52,18 +50,160 @@ const BluePrint = () => {
       });
     }
   }, [workflows]);
-
+  const [openDupplicate, setOpenDupplicate] = useState(false);
+  const [openWorkflowEdit, setOpenWorkflowEdit] = useState(false);
+  const [versionToCopy, setVersionToCopy] = useState<any>();
+  const renderTag = (status:string, recommended: boolean) => {
+    let rs = <></>;
+    if (recommended === true) {
+      rs = <Tag style={{ border: 'none' }} color="purple">Recommended</Tag>;
+    } else {
+      switch (status) {
+        case 'PUBLISHED':
+          rs = <Tag style={{ border: 'none' }} color="green">Published</Tag>;
+          break;
+        case 'DRAFT':
+          rs = <Tag style={{ border: 'none' }} color="gray">Draft</Tag>;
+          break;
+        default:
+          rs = <Tag style={{ border: 'none' }}>{status}</Tag>;
+          break;
+      }
+    }
+    return rs;
+  };
+  const navigateToNewMission = (thisVersion:any) => {
+    navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}/${PAGE_ROUTES.INITIATIVE.MISSION}/`);
+  };
+  const navigateToVersion = (thisVersion:any) => {
+    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}`);
+  };
+  const navigateToNewVersion = () => {
+    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/new`);
+  };
+  const handleNewVersion = async (title:string) => {
+    if (title === '') {
+      Modal.error({
+        title: 'Error',
+        content: 'Please enter a version title',
+      });
+      return;
+    }
+    const versionToSave = {
+      workflowId,
+      versionId: -1,
+      version: title,
+      status: 'DRAFT',
+      versionData: versionToCopy?.data,
+      recommended: false,
+    };
+    setOpenDupplicate(false);
+    setVersionToCopy(undefined);
+    await upsertWorkflowVersion({
+      dispatch,
+      workflowVersion: versionToSave,
+      onSuccess: (data:any) => {
+        const versionIdString = createIdString(data[0].version, data[0].id);
+        navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${workflowIdString}/${versionIdString}`);
+        Modal.success({
+          maskClosable: true,
+          content: 'Data saved successfully',
+        });
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error.message,
+        });
+      },
+      mode: undefined,
+    });
+  };
+  const handleSaveWorkflowInfo = async ({
+    title, desc, iconUrl,
+  }: {
+    title?:string, desc?:string, iconUrl?: string,
+  }) => {
+    const toUpdate:any = {};
+    if (title !== workflow.title) toUpdate.title = title;
+    if (desc !== workflow.desc) toUpdate.desc = desc;
+    if (iconUrl !== workflow.icon_url) toUpdate.iconUrl = iconUrl;
+    updateAWorkflowInfo({
+      info: {
+        id: workflowId,
+        ...toUpdate,
+      },
+      dispatch,
+      onSuccess: () => {
+        Modal.success({
+          title: 'Success',
+          content: 'Data saved successfully',
+        });
+      },
+    });
+  };
   return (
     <div className="container mx-auto relative">
-      <div className="relative my-[20px]">
-        <Card>
-          <Meta
-            title={`Workflow: ${workflow.title}`}
-            description={workflow.desc}
-            avatar={<Avatar src={workflow.icon_url} />}
-          />
-        </Card>
-      </div>
+      <EditWorkflow
+        open={openWorkflowEdit}
+        setOpen={(toOpen:boolean) => {
+          setOpenWorkflowEdit(toOpen);
+        }}
+        workflowIcon={workflow?.icon_url}
+        workflowTitle={workflow?.title}
+        workflowDesc={workflow?.desc}
+        onSave={(title:string, desc:string, iconUrl:string) => {
+          handleSaveWorkflowInfo({
+            title, desc, iconUrl,
+          });
+          setOpenWorkflowEdit(false);
+        }}
+      />
+      <NewVersion
+        open={openDupplicate}
+        setOpen={(toOpen:boolean) => {
+          setOpenDupplicate(toOpen);
+          if (!toOpen) setVersionToCopy(undefined);
+        }}
+        versionTitle={`Copy of ${versionToCopy?.version}`}
+        onSave={handleNewVersion}
+      />
+      <Space direction="vertical" className="w-full mt-8">
+        <Space direction="horizontal">
+          <Icon iconUrl={workflow.icon_url} size="medium" />
+          {workflow.title}
+        </Space>
+        {workflow.desc}
+        <Space direction="horizontal" className="flex justify-between">
+          <Button
+            type="link"
+            onClick={() => setOpenWorkflowEdit(true)}
+            icon={<EditOutlined />}
+            className="text-violet-500 flex items-center p-0"
+          >
+            Edit workflow information
+          </Button>
+          <Space direction="horizontal">
+            <Button
+              type="default"
+              className="flex items-center"
+              icon={<PlusOutlined />}
+              onClick={() => navigateToNewVersion()}
+            >
+              Create a new version
+            </Button>
+            {/* TODO: filter by workflow version! */}
+            <Button
+              type="default"
+              icon={<PlusOutlined />}
+              className="flex items-center bg-violet-500 text-white hover:text-white"
+            >
+              Create a new mission
+            </Button>
+          </Space>
+        </Space>
+      </Space>
+      <Divider />
       <div className="flex items-center mb-6 container justify-between">
         <div className="text-gray-title font-semibold text-text_5 pl-1.5 flex flex-row items-center">
           <div className="flex flex-row items-center">
@@ -74,23 +214,13 @@ const BluePrint = () => {
               <span>
                 Versions
               </span>
-              (
-              {workflow.workflow_version.length}
-              )
+              <span className="mx-2">
+                (
+                {workflow.workflow_version.length}
+                )
+              </span>
             </span>
           </div>
-        </div>
-        <div className="flex flex-row items-center">
-          <Button
-            type="link"
-            className="flex items-center"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/new`);
-            }}
-          >
-            New & Clear
-          </Button>
         </div>
       </div>
       <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
@@ -98,35 +228,77 @@ const BluePrint = () => {
           return (
             <Card
               key={version.id}
-              title={`${version.version} [${version.status}]`}
-              className="w-[300px]"
-              extra={version.recommended ? <StarFilled title="Should show at new Mission screen" /> : <StarOutlined />}
+              className={`w-[300px] ${versionToCopy?.id === version.id ? 'shadow-md shadow-violet-500' : null}`}
+              onClick={() => navigateToVersion(version)}
+              hoverable
+              size="small"
             >
-              <div className="flex flex-row items-align-center">
-                <button
-                  onClick={() => {
-                    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(version.version, version.id)}`);
-                  }}
-                  className="hover:bg-slate-200 bg-slate-100 rounded text-slate-700 p-2 h-[44px]"
-                >
-                  Edit
-                </button>
-                {version.status === 'PUBLISHED' ?
-                  (
-                    <div
-                      className="cursor-pointer hover:bg-slate-200 bg-sky-500 rounded text-white hover:text-slate-700 p-2 inline-block h-[44px] ml-3 items-align-center flex"
-                      onClick={() => {
-                        navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(version.version, version.id)}/${PAGE_ROUTES.INITIATIVE.MISSION}/`);
-                      }}
-                    >
-                      <PlusIcon className="inline-block" />
-                      <div className="pl-2 inline-block line flex items-center select-none">New Mission</div>
+              <Space direction="vertical" size="large" className="w-full">
+                {renderTag(version.status, version.recommended)}
+                <Space direction="horizontal" size="large" className="flex justify-between w-full">
+                  <Space direction="vertical" size="small" className="w-full">
+                    <div className="font-bold">
+                      {version.version}
                     </div>
-                  )
-                  :
-                  null
-                }
-              </div>
+                    <div className="text-xs">
+                      Created on
+                      <span className="mx-1">
+                        {moment(version.created_at).format('YYYY-MM-DD HH:mm:ss')}
+                      </span>
+                    </div>
+                  </Space>
+                  <Popover
+                    // trigger={['click']}
+                    content={(
+                      <Space direction="vertical" size="middle">
+                        <Button
+                          onClick={(e:any) => {
+                            e.stopPropagation();
+                            navigateToVersion(version);
+                          }}
+                          type="default"
+                          className="w-full"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={(e:any) => {
+                            e.stopPropagation();
+                            setVersionToCopy(version);
+                            setOpenDupplicate(true);
+                          }}
+                          type="default"
+                          className="w-full"
+                        >
+                          Dupplicate
+                        </Button>
+                        {version.status === 'PUBLISHED' ?
+                        (
+                          <Button
+                            type="default"
+                            onClick={(e:any) => {
+                              e.stopPropagation();
+                              navigateToNewMission(version);
+                            }}
+                            className="w-full"
+                          >
+                            New Mission
+                          </Button>
+                        )
+                        :
+                        null
+                      }
+                      </Space>
+                    )}
+                  >
+                    <Button
+                      icon={<MoreOutlined />}
+                      shape="circle"
+                      className="flex items-center justify-center"
+                    />
+                  </Popover>
+                </Space>
+              </Space>
             </Card>
           );
         })}
