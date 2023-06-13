@@ -11,7 +11,7 @@ const Meta = ({
 }) => {
   return (
     <Space direction="vertical" size="large" className="w-full">
-      <div>
+      <Space direction="vertical" className="w-full">
         <Icon
           editable={currentMission.status !== 'PUBLISHED'}
           iconUrl={currentMission.icon_url}
@@ -25,8 +25,9 @@ const Meta = ({
             });
           }}
         />
-      </div>
-      <div>
+      </Space>
+      <Space direction="vertical" size="small" className="w-full">
+        <span>Title</span>
         <Input
           placeholder="Mission title"
           className="w-full"
@@ -40,8 +41,9 @@ const Meta = ({
           }}
           disabled={currentMission.status === 'PUBLISHED'}
         />
-      </div>
-      <div>
+      </Space>
+      <Space direction="vertical" className="w-full">
+        <span>Description</span>
         <TextArea
           placeholder="Mission description"
           className="w-[100%] border border-primary_logo"
@@ -55,7 +57,7 @@ const Meta = ({
           }}
           disabled={currentMission.status === 'PUBLISHED'}
         />
-      </div>
+      </Space>
       {/* <div>
         <TextArea
           value={currentMission.data}

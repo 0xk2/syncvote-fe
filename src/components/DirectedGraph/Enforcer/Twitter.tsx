@@ -101,6 +101,9 @@ const Display = ({
   );
 };
 
+// TODO: produce an interface for the Enforcer
+// Display for Workflow
+// should be different to Display for Mission
 export default {
   Add,
   Display,

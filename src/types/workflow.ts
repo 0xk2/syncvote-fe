@@ -5,5 +5,5 @@ export interface IWorkflowVersion {
   version? : '',
   created_at? : '',
   workflow_id? : number,
-  data: '',
+  data: any,
 }

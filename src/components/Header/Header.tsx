@@ -95,6 +95,7 @@ function Header({
                           (
                             <Avatar
                               src={getImageUrl({ filePath: currentOrg?.icon_url?.replace('preset:', ''), isPreset: currentOrg?.icon_url?.indexOf('preset:') === 0, type: 'icon' })}
+                              className="mx-2"
                             />
                           )
                           :

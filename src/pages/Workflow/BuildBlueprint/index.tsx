@@ -2,16 +2,13 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@components/Button/Button';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import { CodeOutlined } from '@ant-design/icons';
-import { Modal } from 'antd';
-import Input from '@components/Input/Input';
-import SaveIcon from '@assets/icons/svg-icons/SaveIcon';
+import { PlusOutlined } from '@ant-design/icons';
+import { Input, Modal, Space } from 'antd';
 import Icon from '@components/Icon/Icon';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading, changeWorkflow } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
-import { DirectedGraph } from '@components/DirectedGraph';
 
 const env = import.meta.env.VITE_EVN;
 
@@ -24,7 +21,6 @@ const BuildBlueprint = () => {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [iconUrl, setIconUrl] = useState('');
-  const [schema, setSchema] = useState('');
   const handleNavigate = () => {
     // const { ROOT, WF_TEMPLATES } = PAGE_ROUTES.WORKFLOW;
     // const path = `/${ROOT}/${WF_TEMPLATES}`;
@@ -52,7 +48,7 @@ const BuildBlueprint = () => {
       const toInsert = {
         workflow_id: insertedId,
         status: 'DRAFT',
-        data: schema,
+        data: '',
       };
       const { data: versions, error: err } = await supabase
       .from('workflow_version')
@@ -61,7 +57,7 @@ const BuildBlueprint = () => {
       dispatch(changeWorkflow({
         id: insertedId, title, desc, icon_url: iconUrl, banner_url: '', owner_org_id: orgId, workflow_version: !err ? versions : [],
       }));
-      if (!error) navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${PAGE_ROUTES.WORKFLOW.EDIT}/${insertedId}`);
+      if (!error && versions) navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${insertedId}/${versions[0].id}`);
     }
     if (error) {
       Modal.error({ content: error.message });
@@ -71,74 +67,53 @@ const BuildBlueprint = () => {
     <div className="container w-full flex justify-center">
       {env === 'dev' ?
         (
-          <div className="w-2/3 flex flex-col gap-8 items-left mt-[5%] mb-4">
-            <div>
-              <div className="text-[34px] mb-2">
-                <CodeOutlined />
-                <span className="pl-4">Create new Workflow in debug</span>
-              </div>
-              <p>This is developer mode, use Debug to edit, save and publish</p>
-            </div>
-            <div>
-              <Icon
-                iconUrl={iconUrl}
-                editable
-                onUpload={(obj) => {
-                  const { isPreset, filePath } = obj;
-                  if (isPreset) {
-                    setIconUrl(`preset:${filePath}`);
-                  } else {
-                    setIconUrl(filePath);
-                  }
+          <Space direction="vertical" className="lg:w-2/3 md:w-full mt-8" size="large">
+            <Space direction="vertical">
+              <h1 className="">Add basic Info</h1>
+            </Space>
+            <Icon
+              iconUrl={iconUrl}
+              editable
+              onUpload={(obj) => {
+                const { isPreset, filePath } = obj;
+                if (isPreset) {
+                  setIconUrl(`preset:${filePath}`);
+                } else {
+                  setIconUrl(filePath);
+                }
+              }}
+            />
+            <Space direction="vertical" size="small" className="w-full">
+              <div>Workflow name</div>
+              <Input
+                className="w-full"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
                 }}
+                placeholder="Workflow name"
               />
-            </div>
-            <Input
-              placeholder="Workflow name"
-              classes="w-full"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-              }}
-            />
-            <textarea
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-              className="w-full h-[300px] border border-primary_logo rounded-lg p-4 mt-2"
-              placeholder="Workflow description"
-            />
-            <div>
-              <p>Version 0.0.1</p>
-              <textarea
-                value={schema}
-                onChange={(e) => setSchema(e.target.value)}
-                className="w-full h-[300px] border border-primary_logo rounded-lg p-4 mt-2"
-                placeholder="Workflow schema in json format"
+            </Space>
+            <Space direction="vertical" size="small" className="w-full">
+              <div>Description</div>
+              <Input.TextArea
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                className="w-full h-[300px] border border-primary_logo rounded-lg p-4"
+                placeholder="Description"
               />
-              <DirectedGraph
-                data={(() => {
-                  let rs = {
-                    checkpoints: [],
-                  };
-                  try {
-                    rs = JSON.parse(schema);
-                  } catch (e) {
-                    return rs;
-                  }
-                  return rs;
-                })()}
-                onNodeClick={() => {}}
-              />
-            </div>
-            <Button
-              startIcon={<SaveIcon />}
-              onClick={() => {
-                handleSave();
-              }}
-            >
-              Save
-            </Button>
-          </div>
+            </Space>
+            <Space direction="horizontal" className="flex justify-end">
+              <Button
+                startIcon={<PlusOutlined />}
+                onClick={() => {
+                  handleSave();
+                }}
+              >
+                Create New Workflow
+              </Button>
+            </Space>
+          </Space>
         )
         :
         (

@@ -131,12 +131,12 @@ const NewMission = () => {
         }
         {currentScreen === 'metadata' ?
           (
-            <>
+            <Space direction="vertical" size="large" className="lg:w-1/2 md:w-full self-center">
               <MissionMeta
                 currentMission={currentMission}
                 setCurrentMission={setCurrentMission}
               />
-              <Space direction="horizontal" size="large" className="flex justify-between">
+              <Space direction="horizontal" size="large" className="w-full flex justify-between">
                 <Button
                   type="default"
                   onClick={() => {
@@ -154,7 +154,7 @@ const NewMission = () => {
                   Create Mission
                 </Button>
               </Space>
-            </>
+            </Space>
           )
          : null
         }
