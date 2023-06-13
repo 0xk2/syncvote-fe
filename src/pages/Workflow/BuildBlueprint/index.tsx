@@ -9,6 +9,7 @@ import { supabase } from '@utils/supabaseClient';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading, changeWorkflow } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
+import { emptyStage } from '@components/DirectedGraph';
 
 const env = import.meta.env.VITE_EVN;
 
@@ -30,6 +31,7 @@ const BuildBlueprint = () => {
     //   },
     // });
   };
+  // TODO: use utils/data in here
   const handleSave = async () => {
     dispatch(startLoading({}));
     let icon_url, preset_icon_url; // eslint-disable-line
@@ -48,7 +50,7 @@ const BuildBlueprint = () => {
       const toInsert = {
         workflow_id: insertedId,
         status: 'DRAFT',
-        data: '',
+        data: emptyStage,
       };
       const { data: versions, error: err } = await supabase
       .from('workflow_version')
