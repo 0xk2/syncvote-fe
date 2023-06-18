@@ -9,19 +9,9 @@ const rootCheckPoint: ICheckPoint = {
   isEnd: true,
   data: {},
 };
-const endNode: ICheckPoint = {
-  id: 'end',
-  position: {
-    x: 200,
-    y: 0,
-  },
-  data: {},
-  isEnd: true,
-};
 export const emptyStage = {
   checkpoints: [
     rootCheckPoint,
-    endNode,
   ],
   start: 'root',
 };

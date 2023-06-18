@@ -14,6 +14,7 @@ const initialState: {
   templates: any[],
   web2Integrations: any[],
   initialized: boolean,
+  // TODO: define Profile & fetch from server
 } = {
   loading: false,
   orgs: [],

@@ -35,7 +35,7 @@ export const queryMission = async ({
   dispatch(setReducerMissions(data));
   dispatch(initialize({}));
   if (data) {
-    onLoad(data);
+    onLoad(newMissions);
   } else if (error) {
     onError(error);
   }

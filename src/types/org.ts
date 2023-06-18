@@ -9,4 +9,12 @@ export interface IOrg {
   org_type: string;
   org_size: string;
   role: string;
+  profile: IProfile[];
+}
+
+export interface IProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url: string;
 }

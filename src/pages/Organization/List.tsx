@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { useNavigate } from 'react-router-dom';
 import { createIdString, getImageUrl } from '@utils/helpers';
-import { Modal } from 'antd';
+import { Drawer, Space } from 'antd';
 import NewOrgFrm from './list/NewOrgFrm';
 
 const Organization = () => {
@@ -19,15 +19,17 @@ const Organization = () => {
     <div className="mt-8 container mx-auto relative">
       <div className="flex items-center mb-10 container justify-between">
         <div className="flex text-lg font-bold">{L('yourOrganization')}</div>
-        <Button
-          variant="outline"
-          startIcon={<PlusIcon />}
-          onClick={
-            () => setShouldShowForm(true)
-          }
-        >
-          {L('createANewOrganization')}
-        </Button>
+        <Space direction="horizontal">
+          <Button
+            variant="outline"
+            startIcon={<PlusIcon />}
+            onClick={
+              () => setShouldShowForm(true)
+            }
+          >
+            {L('createANewOrganization')}
+          </Button>
+        </Space>
       </div>
       <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-center">
         {orgs.map((org:any) => {
@@ -75,17 +77,18 @@ const Organization = () => {
           );
         })}
       </div>
-      <Modal
+      <Drawer
         open={shouldShowForm}
         title={L('createANewOrganization')}
         footer={null}
-        onCancel={() => setShouldShowForm(false)}
+        onClose={() => setShouldShowForm(false)}
+        size="large"
       >
         <NewOrgFrm onSubmit={() => {
           setShouldShowForm(false);
         }}
         />
-      </Modal>
+      </Drawer>
     </div>
   );
 };

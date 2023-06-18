@@ -91,7 +91,6 @@ const Icon = ({
   const [uploading, setUploading] = useState(false);
   const filePath = iconUrl?.indexOf('preset:') === 0 ? iconUrl?.replace('preset:', '') : iconUrl;
   const url = getImageUrl({ filePath, isPreset: iconUrl?.indexOf('preset:') === 0, type: 'icon' });
-
   const uploadIcon = async (event : any) => {
     if (onUpload) {
       if (typeof event === 'string') {
@@ -139,7 +138,7 @@ const Icon = ({
   };
   return (
     <>
-      {iconUrl ? (
+      {url ? (
         <div className="relative inline">
           <Avatar size={getSize(size)} src={<img src={url} alt="icon_+{getSize(size)}" className="bg-white outline outline-2 outline-white" />} />
           {editable === true ? <UploadBtn uploading={uploading} uploadIcon={uploadIcon} /> : null}

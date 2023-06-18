@@ -3,18 +3,19 @@ import BannerDashBoard from '@components/BannerDashBoard/BannerDashBoard';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetBlueprint } from '@redux/reducers/blueprint.reducer';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createIdString, extractIdFromIdString, getImageUrl } from '@utils/helpers';
+import { createIdString, extractIdFromIdString } from '@utils/helpers';
 import { IOrgType } from '@redux/reducers/ui.reducer/interface';
-import { Avatar, Modal, Card as AntCard } from 'antd';
-import Meta from 'antd/es/card/Meta';
+import { Modal, Card as AntCard, Space } from 'antd';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
 import DataIcon from '@assets/icons/svg-icons/DataIcon';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import {
   queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg,
 } from '@middleware/data';
+import Icon from '@components/Icon/Icon';
 import { IOrg } from '../../types/org';
-
+import EditOrg from './home/EditOrg';
+console.log('test');
 const HomePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -35,7 +36,9 @@ const HomePage = () => {
     org_type: '',
     org_size: '',
     role: '',
+    profile: [],
   });
+  const [showOrgEdit, setShowOrgEdit] = useState(false);
   useEffect(() => {
     dispatch(resetBlueprint(''));
     setCurrentOrg(orgs[idx]);
@@ -62,8 +65,17 @@ const HomePage = () => {
   }, [orgs]);
   return (
     <div className="flex flex-col w-full">
+      <EditOrg
+        isOpen={showOrgEdit}
+        onClose={() => setShowOrgEdit(false)}
+        title={currentOrg?.title}
+        desc={currentOrg?.desc}
+        profile={currentOrg?.profile}
+        onSave={(obj:any) => {}}
+      />
       <BannerDashBoard
         org={currentOrg}
+        setShowOrgEdit={setShowOrgEdit}
         setOrg={async (obj:any) => {
           setCurrentOrg(obj);
           upsertAnOrg({
@@ -95,10 +107,6 @@ const HomePage = () => {
           <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
             {
               missions.map((m:any) => {
-                let avatarUrl = '';
-                let isPreset = false;
-                isPreset = m.icon_url ? isPreset = m.icon_url.includes('preset') : false;
-                avatarUrl = getImageUrl({ filePath: m.icon_url.replace('preset:', ''), isPreset, type: 'icon' });
                 return (
                   <AntCard
                     key={m.id}
@@ -131,11 +139,15 @@ const HomePage = () => {
                       </div>,
                     ]}
                   >
-                    <Meta
-                      avatar={<Avatar src={avatarUrl} />}
-                      title={`${m.title} (${m.status})`}
-                      description={m.desc}
-                    />
+                    <Space direction="horizontal" className="flex items-start">
+                      <Icon iconUrl={m.icon_url} size="large" />
+                      <Space direction="vertical">
+                        <div className="text-ellipsis overflow-hidden max-h-16 font-bold">
+                          {m.title}
+                        </div>
+                        <div className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{m.desc}</div>
+                      </Space>
+                    </Space>
                   </AntCard>
                 );
               })
@@ -160,10 +172,6 @@ const HomePage = () => {
           <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
             {
               workflows.map((w:any) => {
-                let avatarUrl = '';
-                let isPreset = false;
-                isPreset = w.icon_url ? isPreset = w.icon_url.includes('preset') : false;
-                avatarUrl = getImageUrl({ filePath: w.icon_url.replace('preset:', ''), isPreset, type: 'icon' });
                 return (
                   <AntCard
                     key={w.id}
@@ -173,11 +181,13 @@ const HomePage = () => {
                       navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${PAGE_ROUTES.WORKFLOW.EDIT}/${createIdString(w.title, w.id)}`, { replace: true });
                     }}
                   >
-                    <Meta
-                      avatar={<Avatar src={avatarUrl} />}
-                      title={`${w.title}`}
-                      description={`${w.workflow_version.length} versions, ${w.desc}`}
-                    />
+                    <Space direction="horizontal" className="flex items-start">
+                      <Icon iconUrl={w.icon_url} size="large" />
+                      <Space direction="vertical">
+                        <div className="text-ellipsis overflow-hidden max-h-16 font-bold">{`${w.title}`}</div>
+                        <p className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{`${w.workflow_version.length} versions, ${w.desc}`}</p>
+                      </Space>
+                    </Space>
                   </AntCard>
                 );
               })

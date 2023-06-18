@@ -3,16 +3,17 @@ import React, { useState } from 'react';
 import ArrowDown from '@assets/icons/svg-icons/ArrowDown';
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import Button from '@components/Button/Button';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { L } from '@utils/locales/L';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { useClickOutside } from '@utils/hooks/useClickOutSide';
 import './styles.scss';
 import { OrgPresetBanner } from '@utils/constants/organization';
 import Icon from '@components/Icon/Icon';
-import { Modal } from 'antd';
+import { Modal, Space } from 'antd';
 import { useSelector } from 'react-redux';
 import { createIdString, getImageUrl } from '@utils/helpers';
+import { EditOutlined } from '@ant-design/icons';
 
 const BannerDashBoard = ({
   org = {
@@ -24,9 +25,11 @@ const BannerDashBoard = ({
     role: '',
   },
   setOrg,
+  setShowOrgEdit,
 }: {
   org: any,
   setOrg: (data:any) => void,
+  setShowOrgEdit: (data: boolean) => void,
 }) => {
   const [isDropDown, setIsDropDown] = useState<boolean>(false);
   const optionRef = useClickOutside(() => setIsDropDown(false));
@@ -109,14 +112,17 @@ const BannerDashBoard = ({
                 </Icon>
               )
             }
-            <div className="text-white ml-4">
-              <p className="text-lg font-semibold tracking-[0.374px]">
-                {org.title}
-              </p>
+            <Space direction="vertical" className="text-white ml-4">
+              <Space direction="horizontal" className="text-white">
+                <p className="text-lg font-semibold tracking-[0.374px]">
+                  {org.title}
+                </p>
+                {isAdmin ? <EditOutlined className="cursor-pointer" onClick={() => { setShowOrgEdit(true); }} /> : null}
+              </Space>
               <p>
                 {org.desc}
               </p>
-            </div>
+            </Space>
           </div>
           <div className="flex">
             {isAdmin ?

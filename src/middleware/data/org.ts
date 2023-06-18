@@ -90,9 +90,10 @@ export const queryOrgs = async ({
   filter: any, onSuccess: (data: any) => void,
   onError?: (data: any) => void, dispatch: any
 }) => {
-  console.log('query orgs');
   const { userId } = filter;
   dispatch(startLoading({}));
+  // TODO: add email in table profile, use ref in profile to select user
+  // TODO: query list of user
   const { data, error } = await supabase.from('user_org')
   .select(`
     role,
@@ -105,12 +106,18 @@ export const queryOrgs = async ({
       preset_icon_url,
       preset_banner_url,
       org_size,
-      org_type
+      org_type,
+      profile (
+        id,
+        email,
+        full_name,
+        avatar_url
+      )
     )
   `).eq('user_id', userId);
   if (!error) {
     const tmp:any[] = [];
-      data.forEach((d) => {
+      data.forEach((d:any) => {
         const org:any = d?.org || {
           id: '', title: '', desc: '',
         };
@@ -125,6 +132,7 @@ export const queryOrgs = async ({
           banner_url: org.banner_url ? org.banner_url : presetBanner,
           org_size: org.org_size,
           org_type: org.org_type,
+          profile: org.profile || [],
         });
       });
       dispatch(setOrgs(tmp));
