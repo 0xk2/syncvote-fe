@@ -127,7 +127,8 @@ const CommonSelectBox = ({
                   >
                     {option?.icon ? (
                       <div className="flex gap-2">
-                        {option?.icon} {option.value ? option.value : option.label}
+                        {option?.icon}
+                        {option.value ? option.value : option.label}
                       </div>
                     ) : (
                       <>{option.value ? option.value : option.label}</>

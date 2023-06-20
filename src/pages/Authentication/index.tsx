@@ -6,7 +6,11 @@ import Discord from '@assets/icons/svg-icons/Discord';
 import ButtonLogin from '@components/ButtonLogin';
 import { useState } from 'react';
 import CommonSelectBox from '@components/SelectBox';
-import { listConnectWallet, listOptionsConnectWallet } from '@pages/Authentication/connectWallet';
+import { useDispatch } from 'react-redux';
+import { supabase } from '@utils/supabaseClient';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { Modal } from 'antd';
+import { listConnectWallet, listOptionsConnectWallet } from './connectWallet';
 
 function Login() {
   const [selectedOption, setSelectedOption] = useState(listOptionsConnectWallet[0]);
@@ -16,6 +20,27 @@ function Login() {
 
   const handleSelectChange = (event: any) => {
     setSelectedOption(event);
+  };
+
+  const dispatch = useDispatch();
+  const handleLogin = async () => {
+    dispatch(startLoading({}));
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    dispatch(finishLoading({}));
+    if (error) {
+      Modal.error({
+        title: L('error'),
+        content: error.message || '',
+      });
+    }
   };
   return (
     <div className="bg-connect text-center w-full">
@@ -34,22 +59,26 @@ function Login() {
               </p>
               <div className="flex gap-[20px] flex-col items-center">
                 <ButtonLogin
-                  className="text-[#252422]"
+                  className="text-[#252422] w-full"
                   Icon={<Google />}
                   title={`${L('continueWidth')} ${L('google')}`}
+                  onClick={handleLogin}
                 />
                 <ButtonLogin
-                  className="text-[#BBBBBA] !cursor-default"
+                  className="w-full"
+                  disabled
                   Icon={<Facebook />}
                   title={`${L('continueWidth')} ${L('facebook')}`}
                 />
                 <ButtonLogin
-                  className="text-[#BBBBBA] !cursor-default"
+                  className="w-full"
+                  disabled
                   Icon={<Twitter />}
                   title={`${L('continueWidth')} ${L('twitter')}`}
                 />
                 <ButtonLogin
-                  className="text-[#BBBBBA] !cursor-default"
+                  className="w-full"
+                  disabled
                   Icon={<Discord />}
                   title={`${L('continueWidth')} ${L('discord')}`}
                 />
@@ -76,10 +105,11 @@ function Login() {
               <div className="flex gap-[20px] flex-col items-center">
                 {renderListConnectWallet.map((value) => (
                   <ButtonLogin
-                    className="text-[#252422]"
+                    className="text-[#252422] w-full"
                     key={value.id}
                     Icon={value.icon}
                     title={value.label}
+                    disabled
                   />
                 ))}
               </div>

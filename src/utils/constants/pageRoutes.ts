@@ -22,7 +22,7 @@ export const PAGE_ROUTES = {
     CHOOSE_WORKFLOW: 'choose',
     SETUP_CHECKPOINT: 'setup-checkpoints',
     REVIEW_CHECKPOINT: 'review-checkpoint',
-    ADD_INITIATIVE: 'add-initiative',
+    aADD_INITIATIVE: 'add-initiative',
     REVIEW_CHECKPOINTS_TREE: 'review-checkpoints-tree',
     SET_UP_INITIATIVE: 'set-up-initiative',
     CHECKPOINT: 'checkpoint',
