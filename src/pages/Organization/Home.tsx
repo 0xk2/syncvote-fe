@@ -15,7 +15,7 @@ import {
 import Icon from '@components/Icon/Icon';
 import { IOrg } from '../../types/org';
 import EditOrg from './home/EditOrg';
-console.log('test');
+
 const HomePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();

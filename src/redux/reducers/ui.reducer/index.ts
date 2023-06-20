@@ -14,6 +14,7 @@ const initialState: {
   templates: any[],
   web2Integrations: any[],
   initialized: boolean,
+  user: any,
   // TODO: define Profile & fetch from server
 } = {
   loading: false,
@@ -25,6 +26,7 @@ const initialState: {
   templates: [],
   web2Integrations: [],
   initialized: false,
+  user: {},
 };
 
 const globalUISlice = createSlice({
@@ -153,6 +155,9 @@ const globalUISlice = createSlice({
       state.templates = [];
       state.web2Integrations = [];
     },
+    setUser: (state, action) => {
+      state.user = action.payload;
+    },
   },
 });
 
@@ -178,5 +183,6 @@ export const {
   deleteWeb2Integration,
   initialize,
   changeWorkflowVersion,
+  setUser,
 } = globalUISlice.actions;
 export default globalUISlice.reducer;

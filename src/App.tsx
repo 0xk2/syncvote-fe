@@ -9,6 +9,7 @@ import { Session } from '@supabase/gotrue-js';
 import { useSelector, useDispatch } from 'react-redux';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
 import { registerVoteMachine } from '@components/DirectedGraph';
+import { setUser } from '@redux/reducers/ui.reducer';
 
 import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
 import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
@@ -43,6 +44,11 @@ function App({
     }
     if (_session !== null && initialized === false && orgs.length === 0) {
       const { user } = _session as Session;
+      dispatch(setUser({
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata.full_name,
+      }));
       queryOrgs({
         filter: {
           userId: user.id,

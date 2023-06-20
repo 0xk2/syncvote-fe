@@ -1,11 +1,13 @@
 import {
-  inviteUserByEmail, queryUserByEmail, sendInviteEmailToExistingMember,
+  inviteUserByEmail, queryUserByEmail, inviteExistingMember,
 } from '@middleware/data';
+import { extractIdFromIdString } from '@utils/helpers';
 import {
   Button, Drawer, Input, Modal, Space,
 } from 'antd';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 const InviteMember = ({
   visible, setVisible,
@@ -15,20 +17,24 @@ const InviteMember = ({
 }) => {
   const [email, setEmail] = useState('');
   const dispatch = useDispatch();
+  const { orgIdString } = useParams();
+  const orgId = extractIdFromIdString(orgIdString);
+  const { orgs, user } = useSelector((state:any) => state.ui);
+  const org = orgs.find((tmp:any) => tmp.id === orgId);
   const handleInvite = async () => {
     queryUserByEmail({
       email,
       dispatch,
       onSuccess: (data:any) => {
         if (data?.length > 0) {
-          // TODO: send email
-          sendInviteEmailToExistingMember({
-            data: {
-              to_email: email,
-              full_name: data[0].email,
-              org_title: '',
-              inviter: '',
-            },
+          const idata:any = {
+            to_email: email,
+            full_name: data[0].full_name,
+            org_title: org.title,
+            inviter: user.full_name,
+          };
+          inviteExistingMember({
+            data: idata,
             dispatch,
             onSuccess: () => {
               Modal.success({

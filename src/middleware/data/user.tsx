@@ -33,7 +33,6 @@ export const inviteUserByEmail = async ({
   }
   dispatch(finishLoading({}));
 };
-
 export const queryUserByEmail = async ({
   email, dispatch, onSuccess, onError = (e:any) => { console.error(e); },
 }: {
@@ -43,7 +42,7 @@ export const queryUserByEmail = async ({
   onError?: (error:any) => void,
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from('profile').select('id, email').eq('email', email);
+  const { data, error } = await supabase.from('profile').select('id, email, full_name').eq('email', email);
   if (error) {
     onError(error);
   } else {
@@ -51,7 +50,20 @@ export const queryUserByEmail = async ({
   }
 };
 
-export const sendInviteEmailToExistingMember = async ({
+export const addMemberToOrg = async ({
+  data, dispatch, onSuccess, onError = (e:any) => { console.error(e); },
+}: {
+  data: any,
+  dispatch: any,
+  onSuccess: (data:any) => void,
+  onError?: (error:any) => void,
+}) => {
+  const { email } = data;
+  dispatch(startLoading({}));
+  dispatch(finishLoading({}));
+};
+
+export const inviteExistingMember = async ({
   data, dispatch, onSuccess, onError = (e:any) => { console.error(e); },
 }: {
   data: any,
@@ -61,7 +73,6 @@ export const sendInviteEmailToExistingMember = async ({
 }) => {
   const { to_email, inviter, full_name, org_title } = data; //eslint-disable-line
   dispatch(startLoading({}));
-  // TODO: move this to the edge function
   try {
     const url = 'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/send-email';
     const response = await fetch(url, {
