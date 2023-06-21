@@ -9,7 +9,7 @@ import { AlertMessage, SelectBoxOption } from 'types/common';
 import ArrowDownIcon from '@assets/icons/svg-icons/ArrowDownIcon';
 import { IRole } from 'types/member';
 import TrashCan from '@assets/icons/svg-icons/TrashCan';
-import Modal from '@components/Modal/Modal';
+import { Modal } from 'antd';
 import XCircle from '@assets/icons/svg-icons/XCircle';
 import ValidateMessage from '@components/ValidateMessage';
 
@@ -278,7 +278,7 @@ const CommonSelectMultiple = ({
           </div>
         )}
       </div>
-      <Modal isOpen={isShowModal} onClose={() => setIsShowModal(false)} className="z-300">
+      <Modal open={isShowModal} onCancel={() => setIsShowModal(false)} className="z-300">
         <div className="w-[585px] text-[#252422]">
           <div className="flex justify-between items-center mb-[26px]">
             <span className="text-[25px] font-[600] text-[#252422]">

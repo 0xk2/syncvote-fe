@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import RocketStartup from '@assets/images/RocketStartup';
 import Button from '@components/Button/Button';
-import ShareToOthers from '@components/ShareToOthers/ShareToOthers';
 import { L } from '@utils/locales/L';
 import ShareIcon from '@assets/icons/svg-icons/ShareIcon';
 import { useNavigate } from 'react-router-dom';
+import ShareToOthers from './ShareToOthers';
 
 interface Props {
   publishHeader?: string;

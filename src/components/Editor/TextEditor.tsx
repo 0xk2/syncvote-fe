@@ -12,7 +12,9 @@ interface TextEditorInterface {
 }
 
 const TextEditor = forwardRef(
-  ({ setValue, value, hideToolbar = false, heightEditor = 500 }: TextEditorInterface, ref) => {
+  ({
+    setValue, value, hideToolbar = false, heightEditor = 500,
+  }: TextEditorInterface, ref) => {
     const editorRef = useRef(null);
 
     const handleEditorChange = (nextValue: any) => {

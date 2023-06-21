@@ -68,8 +68,9 @@ const UploadButton: React.FC<Props> = ({
     fileInputRef.current?.click();
   };
 
-  const validateStatus = () =>
-    validStatus ? 'ml-4 text-green-version-5' : 'ml-4 text-red-version-5';
+  const validateStatus = () => {
+    return validStatus ? 'ml-4 text-green-version-5' : 'ml-4 text-red-version-5';
+  };
 
   return (
     <div className={`flex flex-col justify-start items-start ${className}`}>

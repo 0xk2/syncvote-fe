@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import PageScreen from '@components/HomeScreen/PageScreen';
 import BuildInitiative from '@pages/Mission/ChooseWorkflow';
-import ChooseTemplate from '@pages/Workflow/ChooseTemplate';
+import ChooseTemplate from '@pages/Workflow/BuildBlueprint/ChooseTemplate';
 import Mission from 'pages/Mission';
 import {
   OrganizationHome,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import './index.css';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Header from '@components/Header/Header';
-import MainLayout from '@components/Layouts/MainLayout';
+import MainLayout from '@layout/MainLayout';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/gotrue-js';
