@@ -2,17 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PAGE_ROUTES } from '@utils/constants/pageRoutes';
 import { useSelector, useDispatch } from 'react-redux';
-import { queryWorkflow, updateAWorkflowInfo, upsertWorkflowVersion } from '@middleware/data';
+import {
+  queryWorkflow,
+  updateAWorkflowInfo,
+  upsertWorkflowVersion,
+  deleteAWorkflow,
+} from '@middleware/data';
 import { createIdString, extractIdFromIdString } from '@utils/helpers';
-import {
-  Card, Button, Space, Tag, Popover, Modal, Divider,
-} from 'antd';
+import { Card, Button, Space, Tag, Popover, Modal, Divider } from 'antd';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
-import {
-  EditOutlined,
-  MoreOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import Icon from '@components/Icon/Icon';
 import NewVersion from './fragment/NewVersion';
@@ -22,7 +21,7 @@ const BluePrint = () => {
   const navigate = useNavigate();
   const { orgIdString, workflowIdString } = useParams();
   const dispatch = useDispatch();
-  const { workflows, initialized } = useSelector((state:any) => state.ui);
+  const { workflows, initialized } = useSelector((state: any) => state.ui);
   const workflowId = extractIdFromIdString(workflowIdString);
   const orgId = extractIdFromIdString(orgIdString);
   const [workflow, setWorkflow] = useState({
@@ -32,8 +31,8 @@ const BluePrint = () => {
     icon_url: '',
     workflow_version: [],
   });
-  const extractWorkflowFromList = (list:any[]) => {
-    const wf = list.find((d:any) => d.id === workflowId);
+  const extractWorkflowFromList = (list: any[]) => {
+    const wf = list.find((d: any) => d.id === workflowId);
     setWorkflow({
       ...wf,
     });
@@ -49,21 +48,35 @@ const BluePrint = () => {
         dispatch,
       });
     }
+
+    console.log(workflows);
   }, [workflows]);
   const [openDupplicate, setOpenDupplicate] = useState(false);
   const [openWorkflowEdit, setOpenWorkflowEdit] = useState(false);
   const [versionToCopy, setVersionToCopy] = useState<any>();
-  const renderTag = (status:string, recommended: boolean) => {
+  const renderTag = (status: string, recommended: boolean) => {
     let rs = <></>;
     if (recommended === true) {
-      rs = <Tag style={{ border: 'none' }} color="purple">Recommended</Tag>;
+      rs = (
+        <Tag style={{ border: 'none' }} color="purple">
+          Recommended
+        </Tag>
+      );
     } else {
       switch (status) {
         case 'PUBLISHED':
-          rs = <Tag style={{ border: 'none' }} color="green">Published</Tag>;
+          rs = (
+            <Tag style={{ border: 'none' }} color="green">
+              Published
+            </Tag>
+          );
           break;
         case 'DRAFT':
-          rs = <Tag style={{ border: 'none' }} color="gray">Draft</Tag>;
+          rs = (
+            <Tag style={{ border: 'none' }} color="gray">
+              Draft
+            </Tag>
+          );
           break;
         default:
           rs = <Tag style={{ border: 'none' }}>{status}</Tag>;
@@ -72,16 +85,31 @@ const BluePrint = () => {
     }
     return rs;
   };
-  const navigateToNewMission = (thisVersion:any) => {
-    navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}/${PAGE_ROUTES.INITIATIVE.MISSION}/`);
+  const navigateToNewMission = (thisVersion: any) => {
+    navigate(
+      `/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${createIdString(
+        workflow.title,
+        workflow.id.toString(),
+      )}/${createIdString(thisVersion.version, thisVersion.id)}/${PAGE_ROUTES.INITIATIVE.MISSION}/`,
+    );
   };
-  const navigateToVersion = (thisVersion:any) => {
-    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}`);
+  const navigateToVersion = (thisVersion: any) => {
+    navigate(
+      `/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(
+        workflow.title,
+        workflow.id.toString(),
+      )}/${createIdString(thisVersion.version, thisVersion.id)}`,
+    );
   };
   const navigateToNewVersion = () => {
-    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/new`);
+    navigate(
+      `/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(
+        workflow.title,
+        workflow.id.toString(),
+      )}/new`,
+    );
   };
-  const handleNewVersion = async (title:string) => {
+  const handleNewVersion = async (title: string) => {
     if (title === '') {
       Modal.error({
         title: 'Error',
@@ -102,9 +130,11 @@ const BluePrint = () => {
     await upsertWorkflowVersion({
       dispatch,
       workflowVersion: versionToSave,
-      onSuccess: (data:any) => {
+      onSuccess: (data: any) => {
         const versionIdString = createIdString(data[0].version, data[0].id);
-        navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${workflowIdString}/${versionIdString}`);
+        navigate(
+          `/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${workflowIdString}/${versionIdString}`,
+        );
         Modal.success({
           maskClosable: true,
           content: 'Data saved successfully',
@@ -120,11 +150,15 @@ const BluePrint = () => {
     });
   };
   const handleSaveWorkflowInfo = async ({
-    title, desc, iconUrl,
+    title,
+    desc,
+    iconUrl,
   }: {
-    title?:string, desc?:string, iconUrl?: string,
+    title?: string;
+    desc?: string;
+    iconUrl?: string;
   }) => {
-    const toUpdate:any = {};
+    const toUpdate: any = {};
     if (title !== workflow.title) toUpdate.title = title;
     if (desc !== workflow.desc) toUpdate.desc = desc;
     if (iconUrl !== workflow.icon_url) toUpdate.iconUrl = iconUrl;
@@ -142,26 +176,56 @@ const BluePrint = () => {
       },
     });
   };
+
+  const handleDeleteWorkflowVersion = (versionToDelete: { id: number }) => {
+    console.log('versionToDelete', versionToDelete.id);
+    deleteAWorkflow({
+      workflowId: versionToDelete.id,
+      dispatch,
+      onSuccess: () => {
+        setWorkflow((prevWorkflow) => ({
+          ...prevWorkflow,
+          workflow_version: prevWorkflow.workflow_version.filter(
+            (version: { id: number }) => version.id !== versionToDelete.id,
+          ),
+        }));
+
+        Modal.success({
+          title: 'Success',
+          content: 'Version deleted successfully',
+        });
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: `An error occurred: ${error.message}`,
+        });
+      },
+    });
+  };
+
   return (
     <div className="container mx-auto relative">
       <EditWorkflow
         open={openWorkflowEdit}
-        setOpen={(toOpen:boolean) => {
+        setOpen={(toOpen: boolean) => {
           setOpenWorkflowEdit(toOpen);
         }}
         workflowIcon={workflow?.icon_url}
         workflowTitle={workflow?.title}
         workflowDesc={workflow?.desc}
-        onSave={(title:string, desc:string, iconUrl:string) => {
+        onSave={(title: string, desc: string, iconUrl: string) => {
           handleSaveWorkflowInfo({
-            title, desc, iconUrl,
+            title,
+            desc,
+            iconUrl,
           });
           setOpenWorkflowEdit(false);
         }}
       />
       <NewVersion
         open={openDupplicate}
-        setOpen={(toOpen:boolean) => {
+        setOpen={(toOpen: boolean) => {
           setOpenDupplicate(toOpen);
           if (!toOpen) setVersionToCopy(undefined);
         }}
@@ -211,24 +275,20 @@ const BluePrint = () => {
               <ZapIcon />
             </span>
             <span className="ml-2 hover:text-slate-500 cursor-pointer">
-              <span>
-                Versions
-              </span>
-              <span className="mx-2">
-                (
-                {workflow.workflow_version.length}
-                )
-              </span>
+              <span>Versions</span>
+              <span className="mx-2">({workflow.workflow_version.length})</span>
             </span>
           </div>
         </div>
       </div>
       <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
-        {workflow.workflow_version.map((version:any) => {
+        {workflow.workflow_version.map((version: any) => {
           return (
             <Card
               key={version.id}
-              className={`w-[300px] ${versionToCopy?.id === version.id ? 'shadow-md shadow-violet-500' : null}`}
+              className={`w-[300px] ${
+                versionToCopy?.id === version.id ? 'shadow-md shadow-violet-500' : null
+              }`}
               onClick={() => navigateToVersion(version)}
               hoverable
               size="small"
@@ -237,9 +297,7 @@ const BluePrint = () => {
                 {renderTag(version.status, version.recommended)}
                 <Space direction="horizontal" size="large" className="flex justify-between w-full">
                   <Space direction="vertical" size="small" className="w-full">
-                    <div className="font-bold">
-                      {version.version}
-                    </div>
+                    <div className="font-bold">{version.version}</div>
                     <div className="text-xs">
                       Created on
                       <span className="mx-1">
@@ -249,10 +307,10 @@ const BluePrint = () => {
                   </Space>
                   <Popover
                     // trigger={['click']}
-                    content={(
+                    content={
                       <Space direction="vertical" size="middle">
                         <Button
-                          onClick={(e:any) => {
+                          onClick={(e: any) => {
                             e.stopPropagation();
                             navigateToVersion(version);
                           }}
@@ -262,7 +320,7 @@ const BluePrint = () => {
                           Edit
                         </Button>
                         <Button
-                          onClick={(e:any) => {
+                          onClick={(e: any) => {
                             e.stopPropagation();
                             setVersionToCopy(version);
                             setOpenDupplicate(true);
@@ -272,11 +330,22 @@ const BluePrint = () => {
                         >
                           Dupplicate
                         </Button>
-                        {version.status === 'PUBLISHED' ?
-                        (
+                        {version.status !== 'PUBLISHED' && (
+                          <Button
+                            onClick={(e: any) => {
+                              e.stopPropagation();
+                              handleDeleteWorkflowVersion(version);
+                            }}
+                            type="default"
+                            className="w-full"
+                          >
+                            Delete
+                          </Button>
+                        )}
+                        {version.status === 'PUBLISHED' ? (
                           <Button
                             type="default"
-                            onClick={(e:any) => {
+                            onClick={(e: any) => {
                               e.stopPropagation();
                               navigateToNewMission(version);
                             }}
@@ -284,12 +353,9 @@ const BluePrint = () => {
                           >
                             New Mission
                           </Button>
-                        )
-                        :
-                        null
-                      }
+                        ) : null}
                       </Space>
-                    )}
+                    }
                   >
                     <Button
                       icon={<MoreOutlined />}
