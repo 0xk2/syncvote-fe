@@ -1,15 +1,18 @@
 import {
-  inviteUserByEmail, queryUserByEmail, sendInviteEmailToExistingMember,
+  inviteUserByEmail,
+  queryUserByEmail,
+  sendInviteEmailToExistingMember,
 } from '@middleware/data';
-import {
-  Button, Drawer, Input, Modal, Space,
-} from 'antd';
+import { Button, Drawer, Input, Modal, Space } from 'antd';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const InviteMember = ({
-  visible, setVisible,
+  orgId,
+  visible,
+  setVisible,
 }: {
+  orgId: number;
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }) => {
@@ -19,11 +22,13 @@ const InviteMember = ({
     queryUserByEmail({
       email,
       dispatch,
-      onSuccess: (data:any) => {
+      onSuccess: (data: any) => {
         if (data?.length > 0) {
           // TODO: send email
           sendInviteEmailToExistingMember({
             data: {
+              org_id: orgId,
+              id_user: data[0].id,
               to_email: email,
               full_name: data[0].email,
               org_title: '',
@@ -72,6 +77,7 @@ const InviteMember = ({
       },
     });
   };
+
   return (
     <Drawer
       open={visible}
@@ -83,9 +89,7 @@ const InviteMember = ({
     >
       <Space direction="vertical" size="large" className="w-full">
         <Space direction="vertical" size="small" className="w-full">
-          <div>
-            Input user email
-          </div>
+          <div>Input user email</div>
           <Input
             placeholder="Email"
             value={email}
@@ -96,11 +100,7 @@ const InviteMember = ({
           />
         </Space>
         <Space direction="horizontal" size="small" className="w-full flex justify-end">
-          <Button
-            type="default"
-            className="w-full"
-            onClick={handleInvite}
-          >
+          <Button type="default" className="w-full" onClick={handleInvite}>
             Invite
           </Button>
         </Space>

@@ -9,9 +9,7 @@ import { Modal, Card as AntCard, Space } from 'antd';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
 import DataIcon from '@assets/icons/svg-icons/DataIcon';
 import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import {
-  queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg,
-} from '@middleware/data';
+import { queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg } from '@middleware/data';
 import Icon from '@components/Icon/Icon';
 import { IOrg } from '../../types/org';
 import EditOrg from './home/EditOrg';
@@ -21,8 +19,8 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
-  const { orgs } = useSelector((state:any) => state.ui);
-  const idx = orgs.findIndex((org:IOrgType) => org.id === orgId);
+  const { orgs } = useSelector((state: any) => state.ui);
+  const idx = orgs.findIndex((org: IOrgType) => org.id === orgId);
   const [workflows, setWorkflows] = useState([]);
   const [missions, setMissions] = useState<IOrg[]>([]);
   const [currentOrg, setCurrentOrg] = useState<IOrg>({
@@ -44,8 +42,7 @@ const HomePage = () => {
     setCurrentOrg(orgs[idx]);
     queryWeb2Integration({
       orgId,
-      onLoad: () => {
-      },
+      onLoad: () => {},
       dispatch,
     });
     queryWorkflow({
@@ -66,25 +63,25 @@ const HomePage = () => {
   return (
     <div className="flex flex-col w-full">
       <EditOrg
+        orgId={orgId}
         isOpen={showOrgEdit}
         onClose={() => setShowOrgEdit(false)}
         title={currentOrg?.title}
         desc={currentOrg?.desc}
         profile={currentOrg?.profile}
-        onSave={(obj:any) => {}}
+        onSave={(obj: any) => {}}
       />
       <BannerDashBoard
         org={currentOrg}
         setShowOrgEdit={setShowOrgEdit}
-        setOrg={async (obj:any) => {
+        setOrg={async (obj: any) => {
           setCurrentOrg(obj);
           upsertAnOrg({
             org: {
               ...currentOrg,
               ...obj,
             },
-            onLoad: () => {
-            },
+            onLoad: () => {},
             dispatch,
           });
         }}
@@ -96,62 +93,59 @@ const HomePage = () => {
               <span className="inline-block">
                 <DataIcon />
               </span>
-              <span className="ml-2">
-                Multi-linked Proposals
-                (
-                {missions.length}
-                )
-              </span>
+              <span className="ml-2">Multi-linked Proposals ({missions.length})</span>
             </div>
           </div>
           <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
-            {
-              missions.map((m:any) => {
-                return (
-                  <AntCard
-                    key={m.id}
-                    bordered
-                    className="w-[300px] border-b_1 hover:drop-shadow-lg"
-                    actions={[
-                      <div
-                        onClick={() => {
-                          navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${PAGE_ROUTES.INITIATIVE.MISSION}/${createIdString(m.title, m.id)}`);
-                        }}
-                      >
-                        {m.status === 'PUBLISHED' ? 'View' : 'Edit'}
-                      </div>,
-                      <div
-                        onClick={() => {
-                          if (m.status === 'PUBLISHED') {
-                            Modal.info({
-                              title: 'Voting',
-                              content: (
-                                <div>
-                                  {m.solana_address}
-                                </div>
-                              ),
-                            });
-                          }
-                        }}
-                        className={`${m.status === 'PUBLISHED' ? null : 'text-slate-300 hover:text-slate-300'}`}
-                      >
-                        Vote
-                      </div>,
-                    ]}
-                  >
-                    <Space direction="horizontal" className="flex items-start">
-                      <Icon iconUrl={m.icon_url} size="large" />
-                      <Space direction="vertical">
-                        <div className="text-ellipsis overflow-hidden max-h-16 font-bold">
-                          {m.title}
-                        </div>
-                        <div className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{m.desc}</div>
-                      </Space>
+            {missions.map((m: any) => {
+              return (
+                <AntCard
+                  key={m.id}
+                  bordered
+                  className="w-[300px] border-b_1 hover:drop-shadow-lg"
+                  actions={[
+                    <div
+                      onClick={() => {
+                        navigate(
+                          `/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${
+                            PAGE_ROUTES.INITIATIVE.MISSION
+                          }/${createIdString(m.title, m.id)}`,
+                        );
+                      }}
+                    >
+                      {m.status === 'PUBLISHED' ? 'View' : 'Edit'}
+                    </div>,
+                    <div
+                      onClick={() => {
+                        if (m.status === 'PUBLISHED') {
+                          Modal.info({
+                            title: 'Voting',
+                            content: <div>{m.solana_address}</div>,
+                          });
+                        }
+                      }}
+                      className={`${
+                        m.status === 'PUBLISHED' ? null : 'text-slate-300 hover:text-slate-300'
+                      }`}
+                    >
+                      Vote
+                    </div>,
+                  ]}
+                >
+                  <Space direction="horizontal" className="flex items-start">
+                    <Icon iconUrl={m.icon_url} size="large" />
+                    <Space direction="vertical">
+                      <div className="text-ellipsis overflow-hidden max-h-16 font-bold">
+                        {m.title}
+                      </div>
+                      <div className="text-ellipsis overflow-hidden max-h-16 text-gray-400">
+                        {m.desc}
+                      </div>
                     </Space>
-                  </AntCard>
-                );
-              })
-            }
+                  </Space>
+                </AntCard>
+              );
+            })}
           </div>
         </div>
 
@@ -161,37 +155,35 @@ const HomePage = () => {
               <span className="inline-block">
                 <ZapIcon />
               </span>
-              <span className="ml-2">
-                Workflow
-                (
-                {workflows.length}
-                )
-              </span>
+              <span className="ml-2">Workflow ({workflows.length})</span>
             </div>
           </div>
           <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
-            {
-              workflows.map((w:any) => {
-                return (
-                  <AntCard
-                    key={w.id}
-                    bordered
-                    className="w-[300px] border-b_1 cursor-pointer hover:drop-shadow-lg"
-                    onClick={() => {
-                      navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${PAGE_ROUTES.WORKFLOW.EDIT}/${createIdString(w.title, w.id)}`, { replace: true });
-                    }}
-                  >
-                    <Space direction="horizontal" className="flex items-start">
-                      <Icon iconUrl={w.icon_url} size="large" />
-                      <Space direction="vertical">
-                        <div className="text-ellipsis overflow-hidden max-h-16 font-bold">{`${w.title}`}</div>
-                        <p className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{`${w.workflow_version.length} versions, ${w.desc}`}</p>
-                      </Space>
+            {workflows.map((w: any) => {
+              return (
+                <AntCard
+                  key={w.id}
+                  bordered
+                  className="w-[300px] border-b_1 cursor-pointer hover:drop-shadow-lg"
+                  onClick={() => {
+                    navigate(
+                      `/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${
+                        PAGE_ROUTES.WORKFLOW.EDIT
+                      }/${createIdString(w.title, w.id)}`,
+                      { replace: true },
+                    );
+                  }}
+                >
+                  <Space direction="horizontal" className="flex items-start">
+                    <Icon iconUrl={w.icon_url} size="large" />
+                    <Space direction="vertical">
+                      <div className="text-ellipsis overflow-hidden max-h-16 font-bold">{`${w.title}`}</div>
+                      <p className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{`${w.workflow_version.length} versions, ${w.desc}`}</p>
                     </Space>
-                  </AntCard>
-                );
-              })
-            }
+                  </Space>
+                </AntCard>
+              );
+            })}
           </div>
         </div>
       </div>

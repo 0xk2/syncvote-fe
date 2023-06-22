@@ -4,12 +4,17 @@ import { supabase } from '@utils/supabaseClient';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const inviteUserByEmail = async ({
-  email, dispatch, onSuccess, onError = (e:any) => { console.error(e); },
+  email,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
 }: {
-  email: string,
-  dispatch: any,
-  onSuccess: (data:any) => void,
-  onError?: (error:any) => void,
+  email: string;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
 }) => {
   dispatch(startLoading({}));
   // TODO: email validate!
@@ -35,12 +40,17 @@ export const inviteUserByEmail = async ({
 };
 
 export const queryUserByEmail = async ({
-  email, dispatch, onSuccess, onError = (e:any) => { console.error(e); },
+  email,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
 }: {
-  email: string,
-  dispatch: any,
-  onSuccess: (data:any) => void,
-  onError?: (error:any) => void,
+  email: string;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
 }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase.from('profile').select('id, email').eq('email', email);
@@ -51,15 +61,29 @@ export const queryUserByEmail = async ({
   }
 };
 
+export const addUserOrg = async (org_id: number, id_user: string) => {
+  const userOrgInfo = {
+    org_id: org_id,
+    user_id: id_user,
+    role: 'MEMBER',
+  };
+  const { data, error } = await supabase.from('user_org').insert(userOrgInfo);
+};
+
 export const sendInviteEmailToExistingMember = async ({
-  data, dispatch, onSuccess, onError = (e:any) => { console.error(e); },
+  data,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
 }: {
-  data: any,
-  dispatch: any,
-  onSuccess: (data:any) => void,
-  onError?: (error:any) => void,
+  data: any;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
 }) => {
-  const { to_email, inviter, full_name, org_title } = data; //eslint-disable-line
+  const { org_id, id_user, to_email, inviter, full_name, org_title } = data; //eslint-disable-line
   dispatch(startLoading({}));
   // TODO: move this to the edge function
   try {
@@ -71,11 +95,15 @@ export const sendInviteEmailToExistingMember = async ({
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        to_email, inviter, full_name, org_title,
+        to_email,
+        inviter,
+        full_name,
+        org_title,
       }),
     });
     const result = await response.json();
-    onSuccess(result);
+
+    onSuccess(addUserOrg(org_id, id_user));
   } catch (error) {
     onError(error);
   }
