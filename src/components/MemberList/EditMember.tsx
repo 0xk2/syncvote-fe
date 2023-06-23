@@ -6,7 +6,7 @@ import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
 import CommonSelectBox from '@components/SelectBox';
 import { SelectBoxOption } from 'types/common';
-import { IRole } from 'types/member';
+import { IRole } from 'types';
 import XCircle from '@assets/icons/svg-icons/XCircle';
 import WarningIcon from '@assets/icons/svg-icons/WarningIcon';
 import './styles.scss';

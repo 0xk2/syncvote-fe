@@ -6,7 +6,7 @@ import {
 import Icon from '@components/Icon/Icon';
 import { queryWeb2Integration, queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
 import { changeVersion } from '@middleware/logic';
-import { extractIdFromIdString } from '@utils/helpers';
+import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import {
   Button, Drawer, Modal, Space,
 } from 'antd';
@@ -22,9 +22,11 @@ const extractVersion = ({
   workflowId: number,
   versionId: number,
 }) => {
-  const wf = workflows?.find((workflow:any) => workflow.id === workflowId);
-  const v = wf?.workflow_version?.find((wv: any) => wv.id === versionId);
-  return v;
+  const wf = workflows.find((workflow:any) => workflow.id === workflowId);
+  if (wf) {
+    return wf.workflow_version.find((wv: any) => wv.id === versionId);
+  }
+  return {};
 };
 
 export const EditVersion = () => {
@@ -36,7 +38,8 @@ export const EditVersion = () => {
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
-  const { workflows, web2Integrations, initialized } = useSelector((state:any) => state.ui);
+  const { web2Integrations } = useSelector((state:any) => state.integration);
+  const { workflows, lastFetch } = useSelector((state:any) => state.workflow);
   const [version, setVersion] = useState<any>(
     extractVersion({
       workflows, workflowId, versionId,
@@ -54,7 +57,7 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w:any) => w.id === workflowId));
   };
   useEffect(() => {
-    if (!initialized) {
+    if (!shouldUseCachedData(lastFetch)) {
       queryWeb2Integration({
         orgId,
         dispatch,
@@ -70,7 +73,7 @@ export const EditVersion = () => {
         },
       });
     }
-  }, [workflows, web2Integrations]);
+  }, [workflows, web2Integrations, lastFetch]);
   const handleSave = async (mode: 'data' | 'info' | undefined, changedData?: any | undefined) => {
     const versionToSave = changedData || version;
     await upsertWorkflowVersion({
@@ -183,7 +186,7 @@ export const EditVersion = () => {
               <div
                 className="hover:text-violet-500 cursor-pointer"
                 onClick={() => {
-                  navigate(`/blueprint/${orgIdString}/edit/${workflowIdString}`);
+                  navigate(`/${orgIdString}/workflow/${workflowIdString}`);
                 }}
               >
                 {workflow?.title}
@@ -216,7 +219,7 @@ export const EditVersion = () => {
         selectedNodeId={selectedNodeId}
         onNodeChanged={(changedNodes) => {
           const newData = structuredClone(version?.data);
-          newData?.checkpoints.forEach((v:any, index:number) => {
+          newData?.checkpoints?.forEach((v:any, index:number) => {
             const changedNode = changedNodes.find((cN:any) => cN.id === v.id);
             if (changedNode && changedNode.position) {
               newData.checkpoints[index].position = changedNode.position;

@@ -1,4 +1,4 @@
-import { ICheckPoint } from '../types/checkpoint';
+import { ICheckPoint } from '@types';
 
 export const changeVersion = ({
   versionData, selectedNodeId, changedCheckPointData,

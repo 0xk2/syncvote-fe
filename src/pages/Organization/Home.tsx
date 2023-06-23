@@ -1,31 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import BannerDashBoard from '@components/BannerDashBoard/BannerDashBoard';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetBlueprint } from '@redux/reducers/blueprint.reducer';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createIdString, extractIdFromIdString } from '@utils/helpers';
-import { IOrgType } from '@redux/reducers/ui.reducer/interface';
+import {
+  createIdString, extractIdFromIdString,
+} from '@utils/helpers';
 import { Modal, Card as AntCard, Space } from 'antd';
 import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
 import DataIcon from '@assets/icons/svg-icons/DataIcon';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import {
   queryMission, queryWeb2Integration, queryWorkflow, upsertAnOrg,
 } from '@middleware/data';
 import Icon from '@components/Icon/Icon';
-import { IOrg } from '../../types/org';
+import { IOrgInfo } from '@redux/reducers/orginfo.reducer/interface';
 import EditOrg from './home/EditOrg';
-
+// TODO: why no org is fetched in here?
 const HomePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
-  const { orgs } = useSelector((state:any) => state.ui);
-  const idx = orgs.findIndex((org:IOrgType) => org.id === orgId);
+  const { orgs } = useSelector((state:any) => state.orginfo);
+  const idx = orgs.findIndex((org:IOrgInfo) => org.id === orgId);
   const [workflows, setWorkflows] = useState([]);
-  const [missions, setMissions] = useState<IOrg[]>([]);
-  const [currentOrg, setCurrentOrg] = useState<IOrg>({
+  const [missions, setMissions] = useState<IOrgInfo[]>([]);
+  const [currentOrg, setCurrentOrg] = useState<IOrgInfo>({
     id: -1,
     title: '',
     desc: '',
@@ -40,7 +39,6 @@ const HomePage = () => {
   });
   const [showOrgEdit, setShowOrgEdit] = useState(false);
   useEffect(() => {
-    dispatch(resetBlueprint(''));
     setCurrentOrg(orgs[idx]);
     queryWeb2Integration({
       orgId,
@@ -71,7 +69,7 @@ const HomePage = () => {
         title={currentOrg?.title}
         desc={currentOrg?.desc}
         profile={currentOrg?.profile}
-        onSave={(obj:any) => {}}
+        onSave={() => {}}
       />
       <BannerDashBoard
         org={currentOrg}
@@ -107,6 +105,7 @@ const HomePage = () => {
           <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
             {
               missions.map((m:any) => {
+                const path = `/${orgIdString}/mission/${createIdString(m.title, m.id)}`;
                 return (
                   <AntCard
                     key={m.id}
@@ -115,8 +114,9 @@ const HomePage = () => {
                     actions={[
                       <div
                         onClick={() => {
-                          navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${PAGE_ROUTES.INITIATIVE.MISSION}/${createIdString(m.title, m.id)}`);
+                          navigate(path);
                         }}
+                        title={path}
                       >
                         {m.status === 'PUBLISHED' ? 'View' : 'Edit'}
                       </div>,
@@ -172,23 +172,28 @@ const HomePage = () => {
           <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
             {
               workflows.map((w:any) => {
+                const path = `/${orgIdString}/workflow/${createIdString(w.title, w.id)}`;
                 return (
-                  <AntCard
+                  <div
                     key={w.id}
-                    bordered
-                    className="w-[300px] border-b_1 cursor-pointer hover:drop-shadow-lg"
-                    onClick={() => {
-                      navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${PAGE_ROUTES.WORKFLOW.EDIT}/${createIdString(w.title, w.id)}`, { replace: true });
-                    }}
+                    title={path}
                   >
-                    <Space direction="horizontal" className="flex items-start">
-                      <Icon iconUrl={w.icon_url} size="large" />
-                      <Space direction="vertical">
-                        <div className="text-ellipsis overflow-hidden max-h-16 font-bold">{`${w.title}`}</div>
-                        <p className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{`${w.workflow_version.length} versions, ${w.desc}`}</p>
+                    <AntCard
+                      bordered
+                      className="w-[300px] border-b_1 cursor-pointer hover:drop-shadow-lg"
+                      onClick={() => {
+                        navigate(path, { replace: true });
+                      }}
+                    >
+                      <Space direction="horizontal" className="flex items-start">
+                        <Icon iconUrl={w.icon_url} size="large" />
+                        <Space direction="vertical">
+                          <div className="text-ellipsis overflow-hidden max-h-16 font-bold">{`${w.title}`}</div>
+                          <p className="text-ellipsis overflow-hidden max-h-16 text-gray-400">{`${w.workflow_version.length} versions, ${w.desc}`}</p>
+                        </Space>
                       </Space>
-                    </Space>
-                  </AntCard>
+                    </AntCard>
+                  </div>
                 );
               })
             }

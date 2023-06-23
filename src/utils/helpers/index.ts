@@ -1,6 +1,7 @@
 import copy from 'copy-to-clipboard';
 import { AlertMessage } from 'types/common';
 
+const cacheTime = import.meta.env.VITE_CACHED_TIME;
 export const isSelected = (item: any, listSelected: Array<any>) =>
   listSelected &&
   listSelected?.length > 0 &&
@@ -114,4 +115,16 @@ export const getImageUrl = ({ filePath = '', isPreset, type }: {
     str = `${supabaseUrl}/storage/v1/object/public/public_images/${filePath}`;
   }
   return str;
+};
+
+export const shouldUseCachedData = (lastFetch: number) => {
+  const now = new Date().getTime();
+  if (!lastFetch || lastFetch < 0) {
+    return false;
+  }
+  if (now - lastFetch < cacheTime) {
+    return true;
+  }
+  console.log('should reload');
+  return false;
 };

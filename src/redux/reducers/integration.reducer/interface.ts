@@ -1,4 +1,4 @@
-export interface IIntegration {
+export interface IWeb2Integration {
   id: string;
   org_id: string;
   provider: string;

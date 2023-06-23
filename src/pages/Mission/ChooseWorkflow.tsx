@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { useNavigate, useParams } from 'react-router-dom';
 import { L } from '@utils/locales/L';
 import { useDispatch, useSelector } from 'react-redux';
-import { createIdString, extractIdFromIdString } from '@utils/helpers';
+import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { Tag } from 'antd';
 import moment from 'moment';
 import { queryWorkflow } from '@middleware/data';
@@ -12,16 +11,15 @@ const ChooseWorkflow = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
-  const { workflows, initialized } = useSelector((state: any) => state.ui);
+  const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
   const orgId = extractIdFromIdString(orgIdString);
   const [workflowVerions, setWorkflowVerions] = React.useState<any[]>([]);
   const handleNavigate = () => {
-    const { ROOT, WF_TEMPLATES } = PAGE_ROUTES.WORKFLOW;
-    const path = `/${ROOT}/${WF_TEMPLATES}`;
-    navigate(path, { state: { previousPath: `/${PAGE_ROUTES.INITIATIVE.ROOT}` } });
+    const path = '/';
+    navigate(path, { state: { previousPath: '/' } });
   };
   useEffect(() => {
-    if (workflows.length === 0 && initialized === false) {
+    if (workflows.length === 0 && !shouldUseCachedData(lastFetch)) {
       queryWorkflow({
         orgId,
         onLoad: (data:any) => {
@@ -58,14 +56,16 @@ const ChooseWorkflow = () => {
         {/* go to `/${PAGE_ROUTES.INITIATIVE.ROOT}/${PAGE_ROUTES.INITIATIVE.REVIEW_CHECKPOINT}` */}
         <div className="flex flex-col gap-4 my-2 w-full border rounded-lg text-[#575655]">
           {
-            workflowVerions.map(w => {
+            workflowVerions.map((w) => {
+              const path = `/${orgIdString}/workflow/${createIdString(w.title, w.workflowId)}/${createIdString(w.version, w.id)}/new-mission`;
               return (
                 <div
                   key={w.id}
                   className="flex justify-between items-center cursor-pointer p-4 hover:bg-slate-100"
                   onClick={() => {
-                    navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${createIdString(w.title, w.workflowId)}/${createIdString(w.version, w.id)}/${PAGE_ROUTES.INITIATIVE.MISSION}`);
+                    navigate(path);
                   }}
+                  title={path}
                 >
                   <p className="text-[17px] truncate">
                     {w.title}

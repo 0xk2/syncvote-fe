@@ -1,12 +1,10 @@
 import { DirectedGraph, ICheckPoint, getVoteMachine } from '@components/DirectedGraph';
 import { Tag, Space, Drawer } from 'antd';
 import moment from 'moment';
-import { IVoteMachine } from '@types';
 import { useState } from 'react';
 import ExternalLinkIcon from '@assets/icons/svg-icons/ExternalLinkIcon';
 import { useNavigate, useParams } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import { IWorkflowVersion } from '../../../types/workflow';
+import { IWorkflowVersion, IVoteMachine } from '@types';
 
 const getSummary = (selected:ICheckPoint) => {
   const machine:IVoteMachine = getVoteMachine(selected?.vote_machine_type || '');
@@ -38,7 +36,7 @@ const ReviewWorkflow = ({
             <Tag>
               {`${currentWorkflowVersion.version}`}
             </Tag>
-            <span className="cursor-pointer" onClick={() => navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/edit/${workflowIdString}`)}>
+            <span className="cursor-pointer" onClick={() => navigate(`/${orgIdString}/edit/${workflowIdString}`)}>
               <ExternalLinkIcon width={16} />
             </span>
           </div>

@@ -7,8 +7,6 @@ export interface IMission {
   data?: string,
   status?: string,
   banner_url?: string,
-  preset_icon_url?: string,
-  preset_banner_url?: string,
   solana_address?: string,
   workflow_version_id?: number,
 }

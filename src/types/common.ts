@@ -1,5 +1,3 @@
-import { IMemberRoles } from '@redux/reducers/memberList.reducer/interface';
-
 export type AlertMessage = {
   type: 'ERROR' | 'WARN' | 'SUCCESS';
   message?: string;
@@ -10,6 +8,6 @@ export type SelectBoxOption = {
   label: string | undefined;
   value?: string | number | undefined;
   disabled?: boolean | undefined;
-  member?: IMemberRoles[];
+  member?: any[];
   cpId?: string;
 };

@@ -3,13 +3,6 @@ import { L } from '@utils/locales/L';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // import { sliceAddressToken } from '@utils/helpers';
 // import { AddressToken } from '@utils/mockData/addressToken';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import { resetProposalStore } from '@redux/reducers/proposal.reducer';
-import { resetBlueprint } from '@redux/reducers/blueprint.reducer';
-import { resetVotingStore } from '@redux/reducers/votingMethod.reducer';
-import { resetSetUpCheckPointsStore } from '@redux/reducers/setupCheckpoints.reducer';
-import { resetRouteStore } from '@redux/reducers/blueprint.reducer/routeDetail';
-import { resetStore } from '@redux/reducers/check-node.reducer';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
@@ -42,28 +35,22 @@ function Header({
   const params = useLocation();
   // const token = window.localStorage.getItem('isConnectWallet');
   const dispatch = useDispatch();
-  const { orgs } = useSelector((state:any) => state.ui);
+  const { orgs } = useSelector((state:any) => state.orginfo);
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const [currentOrg, setCurrentOrg] = useState(orgs.find((org:any) => org.id === orgId));
   const handleClearStore = () => {
-    dispatch(resetProposalStore());
-    dispatch(resetBlueprint({ keepName: false }));
-    dispatch(resetRouteStore());
-    dispatch(resetSetUpCheckPointsStore());
-    dispatch(resetVotingStore());
-    dispatch(resetStore());
   };
   useEffect(() => {
     setCurrentOrg(orgs.find((org:any) => org.id === orgId));
   }, [orgs, orgId]);
   let currentPage = Pages.UNKNOWN;
   switch (params.pathname) {
-    case `/${PAGE_ROUTES.LOGIN}`: currentPage = Pages.LOGIN; break;
-    case `/${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`: currentPage = Pages.ORG_HOME; break;
-    case `/${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}/setting`: currentPage = Pages.ORG_SETTING; break;
-    case `/${PAGE_ROUTES.ROOT}`: currentPage = Pages.ORG_SELECTOR; break;
+    case '/login': currentPage = Pages.LOGIN; break;
+    case `/${orgIdString}`: currentPage = Pages.ORG_HOME; break;
+    case `/${orgIdString}/setting`: currentPage = Pages.ORG_SETTING; break;
+    case '/': currentPage = Pages.ORG_SELECTOR; break;
     default: currentPage = Pages.UNKNOWN; break;
   }
   return (
@@ -82,12 +69,12 @@ function Header({
                       <HomeOutlined
                         style={{ fontSize: '24px' }}
                         onClick={() => {
-                          navigate(PAGE_ROUTES.ROOT);
+                          navigate('/');
                         }}
                       />
                       <span className="ml-2 mr-2">/</span>
                       <span onClick={() => {
-                          navigate(`${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
+                          navigate(`/${orgIdString}`);
                         }}
                       >
                         {
@@ -109,7 +96,7 @@ function Header({
                       <span
                         className="mr-4"
                         onClick={() => {
-                          navigate(`${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
+                          navigate(`/${orgIdString}`);
                         }}
                       >
                         {currentOrg?.title}
@@ -118,7 +105,7 @@ function Header({
                         type="text"
                         disabled={currentPage === Pages.ORG_HOME}
                         onClick={() => {
-                          navigate(`${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
+                          navigate(`/${orgIdString}`);
                         }}
                       >
                         Governance
@@ -128,7 +115,7 @@ function Header({
                         className="ml-2"
                         disabled={currentPage === Pages.ORG_SETTING}
                         onClick={() => {
-                          navigate(`${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}/setting`);
+                          navigate(`/${orgIdString}/setting`);
                         }}
                       >
                         Settings
@@ -141,7 +128,7 @@ function Header({
                       className="mr-2"
                       onClick={() => {
                         handleClearStore();
-                        navigate(PAGE_ROUTES.ROOT);
+                        navigate('/');
                       }}
                     >
                       <Logo width="128" height="24" />
@@ -169,7 +156,7 @@ function Header({
                 dispatch(startLoading({}));
                 await supabase.auth.signOut();
                 dispatch(finishLoading({}));
-                navigate(PAGE_ROUTES.LOGIN);
+                navigate('/login');
               }}
               title={L('clickToLogout')}
             >

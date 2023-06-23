@@ -15,7 +15,9 @@ type Props = {
   contentDate?: string;
 };
 
-const BluePrintCardContent = ({ tagType, date, amount, title, dataAvatar, contentDate }: Props) => {
+const BluePrintCardContent = ({
+  tagType, date, amount, title, dataAvatar, contentDate,
+}: Props) => {
   const renderAvatarList = (data: any) =>
     data.map((avatar: string, index: number) => (
       <div key={avatar} className="relative w-6 h-6">

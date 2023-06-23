@@ -1,4 +1,4 @@
-import { IIntegration } from '@pages/Organization/interface';
+import { IWeb2Integration } from '@types';
 import {
   Button, Space,
 } from 'antd';
@@ -41,7 +41,7 @@ const getProvider = (provider:string) => {
 const TriggerTab = ({
   web2Integrations, triggers, onChange, children, selectedNode, allNodes, editable = false,
 }:{
-  web2Integrations: IIntegration[],
+  web2Integrations: IWeb2Integration[],
   triggers: ITrigger[],
   onChange: (data:any) => void,
   children: any[],
@@ -52,7 +52,7 @@ const TriggerTab = ({
   const [showAddTriggerDrawer, setShowAddTriggerDrawer] = useState(false);
   const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
   const [selectedTriggerAt, setSelectedTriggerAt] = useState<string>();
-  const options = web2Integrations?.map((integration:IIntegration) => {
+  const options = web2Integrations?.map((integration:IWeb2Integration) => {
     return {
       id: integration.id,
       label: integration.username !== ' ' ? `${integration.provider} (${integration.username})` : integration.provider,

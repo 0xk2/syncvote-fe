@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@components/Button/Button';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Space } from 'antd';
 import Icon from '@components/Icon/Icon';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch } from 'react-redux';
-import { startLoading, finishLoading, changeWorkflow } from '@redux/reducers/ui.reducer';
+import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { changeWorkflow } from '@redux/reducers/workflow.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
 import { emptyStage } from '@components/DirectedGraph';
 
@@ -23,13 +23,6 @@ const ChooseTemplate = () => {
   const [desc, setDesc] = useState('');
   const [iconUrl, setIconUrl] = useState('');
   const handleNavigate = () => {
-    // const { ROOT, WF_TEMPLATES } = PAGE_ROUTES.WORKFLOW;
-    // const path = `/${ROOT}/${WF_TEMPLATES}`;
-    // navigate(path, {
-    //   state: {
-    //     previousPath: `/${PAGE_ROUTES.WORKFLOW.ROOT}/${PAGE_ROUTES.WORKFLOW.SELECT_TEMPLATE}`,
-    //   },
-    // });
   };
   // TODO: use utils/data in here
   const handleSave = async () => {
@@ -59,7 +52,7 @@ const ChooseTemplate = () => {
       dispatch(changeWorkflow({
         id: insertedId, title, desc, icon_url: iconUrl, banner_url: '', owner_org_id: orgId, workflow_version: !err ? versions : [],
       }));
-      if (!error && versions) navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${insertedId}/${versions[0].id}`);
+      if (!error && versions) navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
     }
     if (error) {
       Modal.error({ content: error.message });

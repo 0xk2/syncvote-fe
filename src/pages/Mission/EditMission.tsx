@@ -1,23 +1,22 @@
-import { Modal, Space } from 'antd';
+import { Modal } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import {
   upsertAMission, deleteMission, queryAMission, queryWeb2Integration,
 } from '@middleware/data';
-import { extractIdFromIdString } from '@utils/helpers';
+import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IMission } from '../../types/mission';
-import { create } from '../../middleware/data/dash';
+import { IMission } from '@types';
+import { create } from '@middleware/data/dash';
 
 import MissionData from './fragments/MissionData';
-import MissionMeta from './fragments/MissionMeta';
 
 const EditMission = () => {
   const {
     missionIdString, orgIdString,
   } = useParams();
-  const { initialized, missions, web2Integrations } = useSelector((state: any) => state.ui);
+  const { web2Integrations } = useSelector((state: any) => state.integration);
+  const { lastFetch, missions } = useSelector((state: any) => state.workflow);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const missionId = extractIdFromIdString(missionIdString);
@@ -32,7 +31,7 @@ const EditMission = () => {
   });
   const [web2IntegrationsState, setWeb2IntegrationsState] = useState(web2Integrations);
   useEffect(() => {
-    if (missionIdString && initialized === false) {
+    if (missionIdString && !shouldUseCachedData(lastFetch)) {
       queryAMission({
         missionId,
         onLoad: (data) => {
@@ -48,7 +47,7 @@ const EditMission = () => {
         dispatch,
       });
     }
-  }, [missions, initialized]);
+  }, [missions, lastFetch]);
   const onSave = async (newMission:any) => {
     await upsertAMission({
       mission: newMission,
@@ -72,7 +71,7 @@ const EditMission = () => {
     deleteMission({
       id: currentMission.id || -1,
       onLoad: () => {
-        navigate(`/${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
+        navigate(`/${orgIdString}`);
         Modal.success({
           title: 'Success',
           content: 'Mission deleted successfully',
@@ -114,10 +113,7 @@ const EditMission = () => {
     onSave(newMission);
   };
   return (
-    <Space direction="vertical" className="w-full">
-      <Space className="container m-auto py-4">
-        <MissionMeta currentMission={currentMission} setCurrentMission={setCurrentMission} />
-      </Space>
+    <div className="w-full h-full">
       <MissionData
         currentMission={currentMission}
         web2IntegrationsState={web2IntegrationsState}
@@ -131,7 +127,7 @@ const EditMission = () => {
         onDelete={onDelete}
         onUnPublish={onUnPublish}
       />
-    </Space>
+    </div>
   );
 };
 

@@ -2,8 +2,6 @@ import React from 'react';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import { CARD_TYPE } from '@utils/constants';
 import { L, LF } from '@utils/locales/L';
-import { useNavigate } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import clsx from 'clsx';
 
 type Props = {
@@ -13,7 +11,7 @@ type Props = {
   decs?: string;
   contentDate?: string;
   tagType?: string;
-  id: string;
+  // id: string;
 };
 
 const ProposalCardContent = ({
@@ -23,7 +21,7 @@ const ProposalCardContent = ({
   decs,
   contentDate,
   tagType,
-  id,
+  // id,
 }: Props) => {
   return (
     <div className="flex flex-col gap-y-2">

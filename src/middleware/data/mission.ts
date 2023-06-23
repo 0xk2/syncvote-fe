@@ -1,12 +1,14 @@
 import {
-  startLoading, finishLoading, deleteMission as reduxDeleteMission,
-  setMissions as setReducerMissions,
-  initialize,
-  setMissions,
-  changeMission,
+  startLoading, finishLoading,
 } from '@redux/reducers/ui.reducer';
+import {
+  deleteMission as reduxDeleteMission,
+  setMissions as setReducerMissions,
+  changeMission,
+  setLastFetch,
+} from '@redux/reducers/mission.reducer';
 import { supabase } from '@utils/supabaseClient';
-import { IOrg } from '../../types/org';
+import { IMission } from '@types';
 
 export const queryMission = async ({
   orgId, onLoad, onError = (error) => {
@@ -24,8 +26,10 @@ export const queryMission = async ({
     .select('*, workflow_version(id, workflow(owner_org_id))')
     .eq('workflow_version.workflow.owner_org_id', orgId);
   dispatch(finishLoading({}));
-  const newMissions:IOrg[] = [];
-  (data || []).forEach((d:any) => {
+  // TODO: check if data is correct
+  const newMissions:IMission[] = [];
+  const mList = Array.isArray(data) ? data : [data];
+  mList.forEach((d:any) => {
     const newd = { ...d };
     newd.icon_url = d.icon_url ? d.icon_url : `preset:${d.preset_icon_url}`;
     delete newd.preset_icon_url;
@@ -33,7 +37,7 @@ export const queryMission = async ({
     newMissions.push(newd);
   });
   dispatch(setReducerMissions(data));
-  dispatch(initialize({}));
+  dispatch(setLastFetch({}));
   if (data) {
     onLoad(newMissions);
   } else if (error) {
@@ -54,15 +58,15 @@ export const queryAMission = async ({
   const { data, error } = await supabase.from('mission').select('*').eq('id', missionId);
   dispatch(finishLoading({}));
   if (data) {
-    const newData = [...data];
+    const newData = { ...data };
     data.forEach((d:any, index:number) => {
       newData[index].icon_url = d.icon_url ? d.icon_url : `preset:${d.preset_icon_url}`;
       newData[index].banner_url = d.banner_url ? d.banner_url : `preset:${d.preset_banner_url}`;
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
-    dispatch(initialize({}));
-    dispatch(setMissions(data));
+    dispatch(setLastFetch({}));
+    dispatch(setReducerMissions(data));
     onLoad(newData);
   } else if (error) {
     onError(error);
@@ -105,7 +109,6 @@ export const upsertAMission = async ({
       delete newData[index].preset_banner_url;
     });
     dispatch(changeMission(newData[0]));
-    dispatch(initialize({}));
     onLoad(newData);
   } else if (error) {
     onError(error);
@@ -128,7 +131,6 @@ export const deleteMission = async ({
     dispatch(reduxDeleteMission({
       id,
     }));
-    dispatch(initialize({}));
     onLoad(data);
   } else {
     onError(error);

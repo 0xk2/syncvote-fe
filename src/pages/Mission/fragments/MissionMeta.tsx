@@ -1,7 +1,7 @@
 import Icon from '@components/Icon/Icon';
 import { Input, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import { IMission } from '../../../types/mission';
+import { IMission } from '@types';
 
 const Meta = ({
   currentMission, setCurrentMission,
@@ -33,7 +33,6 @@ const Meta = ({
           className="w-full"
           value={currentMission.title}
           onChange={(e) => {
-            // TODO: url encode -> remove special character
             setCurrentMission({
               ...currentMission,
               title: e.target.value,

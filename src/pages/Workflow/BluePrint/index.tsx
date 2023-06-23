@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PAGE_ROUTES } from '@utils/constants/pageRoutes';
 import { useSelector, useDispatch } from 'react-redux';
 import { queryWorkflow, updateAWorkflowInfo, upsertWorkflowVersion } from '@middleware/data';
-import { createIdString, extractIdFromIdString } from '@utils/helpers';
+import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import {
   Card, Button, Space, Tag, Popover, Modal, Divider,
 } from 'antd';
@@ -22,7 +21,7 @@ const BluePrint = () => {
   const navigate = useNavigate();
   const { orgIdString, workflowIdString } = useParams();
   const dispatch = useDispatch();
-  const { workflows, initialized } = useSelector((state:any) => state.ui);
+  const { workflows, lastFetch } = useSelector((state:any) => state.workflow);
   const workflowId = extractIdFromIdString(workflowIdString);
   const orgId = extractIdFromIdString(orgIdString);
   const [workflow, setWorkflow] = useState({
@@ -35,12 +34,11 @@ const BluePrint = () => {
   const extractWorkflowFromList = (list:any[]) => {
     const wf = list.find((d:any) => d.id === workflowId);
     setWorkflow({
-      ...wf,
+      ...structuredClone(wf),
     });
   };
   useEffect(() => {
-    if (workflows.length > 0) extractWorkflowFromList(workflows);
-    if (initialized === false) {
+    if (!shouldUseCachedData(lastFetch)) {
       queryWorkflow({
         orgId,
         onLoad: (data) => {
@@ -48,8 +46,10 @@ const BluePrint = () => {
         },
         dispatch,
       });
+    } else if (workflows.length > 0) {
+      extractWorkflowFromList(workflows);
     }
-  }, [workflows]);
+  }, [workflows, lastFetch]);
   const [openDupplicate, setOpenDupplicate] = useState(false);
   const [openWorkflowEdit, setOpenWorkflowEdit] = useState(false);
   const [versionToCopy, setVersionToCopy] = useState<any>();
@@ -73,13 +73,13 @@ const BluePrint = () => {
     return rs;
   };
   const navigateToNewMission = (thisVersion:any) => {
-    navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}/${PAGE_ROUTES.INITIATIVE.MISSION}/`);
+    navigate(`/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}/new-mission`);
   };
   const navigateToVersion = (thisVersion:any) => {
-    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}`);
+    navigate(`/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/${createIdString(thisVersion.version, thisVersion.id)}`);
   };
   const navigateToNewVersion = () => {
-    navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/new`);
+    navigate(`/${orgIdString}/${createIdString(workflow.title, workflow.id.toString())}/new-version`);
   };
   const handleNewVersion = async (title:string) => {
     if (title === '') {
@@ -104,7 +104,7 @@ const BluePrint = () => {
       workflowVersion: versionToSave,
       onSuccess: (data:any) => {
         const versionIdString = createIdString(data[0].version, data[0].id);
-        navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${workflowIdString}/${versionIdString}`);
+        navigate(`/${orgIdString}/${workflowIdString}/${versionIdString}`);
         Modal.success({
           maskClosable: true,
           content: 'Data saved successfully',

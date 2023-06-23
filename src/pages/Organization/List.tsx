@@ -4,14 +4,14 @@ import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
 import Icon from '@components/Icon/Icon';
 import { useSelector } from 'react-redux';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { useNavigate } from 'react-router-dom';
 import { createIdString, getImageUrl } from '@utils/helpers';
 import { Drawer, Space } from 'antd';
 import NewOrgFrm from './list/NewOrgFrm';
 
 const Organization = () => {
-  const { orgs, presetBanners } = useSelector((state: any) => state.ui);
+  const { presetBanners } = useSelector((state: any) => state.ui);
+  const { orgs } = useSelector((state: any) => state.orginfo);
   const [shouldShowForm, setShouldShowForm] = useState(false);
   const presetBanner = presetBanners[15] ? getImageUrl({ filePath: presetBanners[15], isPreset: true, type: 'banner' }) : null;
   const navigate = useNavigate();
@@ -38,13 +38,15 @@ const Organization = () => {
             const filePath = org.banner_url.indexOf('preset:') === 0 ? org.banner_url.replace('preset:', '') : org.banner_url;
             bannerUrl = getImageUrl({ filePath, isPreset: org.banner_url.indexOf('preset:') === 0, type: 'banner' });
           }
+          const path = `/${createIdString(org.title, org.id)}`;
           return (
             <div
               key={org.id}
               className="w-[290px] border-b_1 cursor-pointer hover:drop-shadow-lg"
               onClick={() => {
-                navigate(`${PAGE_ROUTES.ORG_DETAIL}/${createIdString(org.title, org.id)}`);
+                navigate(path);
               }}
+              title={path}
             >
               {org.background_url ?
                 <div className="w-[290px] h-[142px]" />

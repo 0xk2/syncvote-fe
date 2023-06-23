@@ -1,7 +1,9 @@
 import {
-  changeWorkflow,
-  finishLoading, initialize, setWorkflows, startLoading,
+  finishLoading, startLoading,
 } from '@redux/reducers/ui.reducer';
+import {
+  setWorkflows, changeWorkflow, setLastFetch, changeWorkflowVersion,
+} from '@redux/reducers/workflow.reducer';
 import { supabase } from '@utils/supabaseClient';
 
 export const upsertWorkflowVersion = async ({
@@ -43,7 +45,7 @@ export const upsertWorkflowVersion = async ({
   const { data, error } = await supabase.from('workflow_version').upsert(toUpsert).select();
   dispatch(finishLoading({}));
   if (data) {
-    // TODO: should we store workflow_version in redux?
+    dispatch(changeWorkflowVersion(data));
     onSuccess(data);
   } else {
     onError(error);
@@ -65,18 +67,21 @@ export const queryWorkflow = async ({
   const { data, error } = await supabase.from('workflow').select('*, workflow_version ( * )').eq('owner_org_id', orgId).order('created_at', { ascending: false });
   dispatch(finishLoading({}));
   if (data) {
-    const newData = structuredClone(data);
-    data.forEach((d:any, index: number) => {
+    const wfList = Array.isArray(data) ? data : [data];
+    const newData:any[] = [];
+    wfList.forEach((d:any, index: number) => {
+      newData[index] = { ...structuredClone(d) };
       const presetIcon = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
       const presetBanner = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.bann_url;
       newData[index].icon_url = d.icon_url ? d.icon_url : presetIcon;
       newData[index].banner_url = d.banner_url ? d.banner_url : presetBanner;
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
+      newData[index].workflow_version = [...newData[index].workflow_version] || [];
     });
     // TODO: is the data match the interface?
     dispatch(setWorkflows(newData));
-    dispatch(initialize({}));
+    dispatch(setLastFetch({}));
     onLoad(newData);
   } else if (error) {
     onError(error);

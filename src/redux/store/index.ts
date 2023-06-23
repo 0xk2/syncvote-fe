@@ -1,23 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
 import languageReducer from '@redux/reducers/language.reducer';
-import votingMethodReducer from '@redux/reducers/votingMethod.reducer';
-import setupCheckpointsReducer from '@redux/reducers/setupCheckpoints.reducer';
-import proposalReducer from '@redux/reducers/proposal.reducer';
-import checkNodeReducer from '@redux/reducers/check-node.reducer';
-import blueprintReducer from '@redux/reducers/blueprint.reducer';
-import routeDetailReducer from '@redux/reducers/blueprint.reducer/routeDetail';
 import uiReducer from '@redux/reducers/ui.reducer';
+import orginfoReducer from '@redux/reducers/orginfo.reducer';
+import workflowReducer from '@redux/reducers/workflow.reducer';
+import missionReducer from '@redux/reducers/mission.reducer';
+import integrationReducer from '@redux/reducers/integration.reducer';
 
 export const store = configureStore({
   reducer: {
     language: languageReducer,
-    votingMethod: votingMethodReducer,
-    setupCheckpoints: setupCheckpointsReducer,
-    proposal: proposalReducer,
-    checkNode: checkNodeReducer,
-    blueprint: blueprintReducer,
-    routerDetail: routeDetailReducer,
     ui: uiReducer,
+    orginfo: orginfoReducer,
+    workflow: workflowReducer,
+    mission: missionReducer,
+    integration: integrationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -36,13 +32,3 @@ export const CLEAR_DATA = 'CLEAR_DATA';
 export const clearData = () => ({
   type: CLEAR_DATA,
 });
-
-const reducer = (state = {}, action: any) => {
-  switch (action.type) {
-    case CLEAR_DATA:
-      return {};
-    // other cases
-    default:
-      return state;
-  }
-};

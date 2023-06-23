@@ -3,12 +3,11 @@ import {
   Button, Input, Select, Space, Modal,
 } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createIdString, extractIdFromIdString } from '@utils/helpers';
+import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
 import { SaveOutlined } from '@ant-design/icons';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 // TODO: forbid special character
 export const NewVersion = () => {
   const [versionToCopy, setVersionToCopy] = useState(-1);
@@ -16,13 +15,13 @@ export const NewVersion = () => {
   const { orgIdString, workflowIdString } = useParams();
   const workflowId = extractIdFromIdString(workflowIdString);
   const orgId = extractIdFromIdString(orgIdString);
-  const { initialized, workflows } = useSelector((state:any) => state.ui);
+  const { lastFetch, workflows } = useSelector((state:any) => state.workflow);
   const dispatch = useDispatch();
   const [screen, setScreen] = useState('chooseVersion');
   const [versionTitle, setVersionTitle] = useState('');
   const navigate = useNavigate();
   useEffect(() => {
-    if (!initialized) {
+    if (!shouldUseCachedData(lastFetch)) {
       queryWorkflow({
         orgId,
         dispatch,
@@ -68,7 +67,7 @@ export const NewVersion = () => {
       workflowVersion: versionToSave,
       onSuccess: (data:any) => {
         const versionIdString = createIdString(data[0].version, data[0].id);
-        navigate(`/${PAGE_ROUTES.WORKFLOW.ROOT}/${orgIdString}/${workflowIdString}/${versionIdString}`);
+        navigate(`/${orgIdString}/${workflowIdString}/${versionIdString}`);
         Modal.success({
           maskClosable: true,
           content: 'Data saved successfully',

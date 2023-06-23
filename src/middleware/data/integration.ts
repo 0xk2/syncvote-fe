@@ -1,7 +1,11 @@
 import {
-  finishLoading, setWeb2Integrations, startLoading, initialize,
-  deleteWeb2Integration as deleteWeb2IntegrationReducer,
+  finishLoading, startLoading,
 } from '@redux/reducers/ui.reducer';
+import {
+  setWeb2Integrations,
+  deleteWeb2Integration as deleteWeb2IntegrationReducer,
+  setLastFetch,
+} from '@redux/reducers/integration.reducer';
 import { supabase } from '@utils/supabaseClient';
 
 export const queryWeb2Integration = async ({
@@ -41,7 +45,7 @@ export const queryWeb2Integration = async ({
     }
     // TODO: is newData follow the interface?
     dispatch(setWeb2Integrations(newData));
-    dispatch(initialize({}));
+    dispatch(setLastFetch({}));
     onLoad(newData);
   } else if (error) {
     onError(error);

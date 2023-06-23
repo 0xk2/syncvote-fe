@@ -9,7 +9,6 @@ import { DropDownItem } from '@components/DropDown/interface';
 import { Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { unsecuredCopyToClipboard } from '@utils/helpers';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 
 const items = [
   {
@@ -64,12 +63,13 @@ const ShareToOthers: React.FC<Props> = ({
     closeModal();
   };
 
+  // TODO: dont know wtf it is
   const handleCopyLink = () => {
     const content = window.location.origin;
     if (window.isSecureContext && navigator.clipboard) {
-      navigator.clipboard.writeText(`${content}/${PAGE_ROUTES.PROPOSAL_DETAIL}/2`);
+      navigator.clipboard.writeText(`${content}/2`);
     } else {
-      unsecuredCopyToClipboard(`${content}/${PAGE_ROUTES.PROPOSAL_DETAIL}/2`);
+      unsecuredCopyToClipboard(`${content}/2`);
     }
     // navigator.clipboard.writeText(window.location.href);
     setIsTooltip(true);

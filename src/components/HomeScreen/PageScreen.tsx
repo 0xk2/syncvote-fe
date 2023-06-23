@@ -5,7 +5,6 @@ import { L } from '@utils/locales/L';
 import Button from '@components/Button/Button';
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import { Link } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import SlideTitle from './SlideTitle';
 
 const PageScreen = () => (
@@ -28,7 +27,7 @@ const PageScreen = () => (
               </p>
             </div>
             <div className="w-full">
-              <Link to={`/${PAGE_ROUTES.INITIATIVE.ROOT}`}>
+              <Link to="/">
                 <Button
                   startIcon={<PlusIcon color="white" />}
                   variant="primary"
@@ -58,7 +57,7 @@ const PageScreen = () => (
               </p>
             </div>
             <div className="w-full">
-              <Link to={`/${PAGE_ROUTES.CREATE_PROPOSAL}`}>
+              <Link to="/onboard">
                 <Button
                   startIcon={<PlusIcon color="white" />}
                   variant="primary"

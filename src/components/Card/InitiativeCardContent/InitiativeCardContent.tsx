@@ -3,8 +3,6 @@ import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import { CARD_TYPE } from '@utils/constants';
 import { L, LF } from '@utils/locales/L';
 import clsx from 'clsx';
-import { useNavigate } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 
 type Props = {
   urlAvatar?: string;
@@ -13,7 +11,7 @@ type Props = {
   title?: string;
   date?: string;
   tagType?: string;
-  id: string;
+  // id: string;
   contentDate?: string;
 };
 
@@ -24,7 +22,7 @@ const InitiativeCardContent = ({
   title,
   date,
   tagType,
-  id,
+  // id,
   contentDate,
 }: Props) => {
   return (

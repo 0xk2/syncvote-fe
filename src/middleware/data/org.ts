@@ -1,7 +1,10 @@
-import { supabase } from '../../utils/supabaseClient';
+import { supabase } from '@utils/supabaseClient';
 import {
-  finishLoading, startLoading, addOrg, changeOrg, initialize, setOrgs,
-} from '../../redux/reducers/ui.reducer';
+  finishLoading, startLoading,
+} from '@redux/reducers/ui.reducer';
+import {
+  changeOrgInfo, setOrgsInfo, setLastFetch,
+} from '@redux/reducers/orginfo.reducer';
 
 export const newOrg = async ({
   orgInfo, onSuccess, onError = (error) => {
@@ -26,12 +29,12 @@ export const newOrg = async ({
     onError(error);
   } else {
     const info = structuredClone(orgInfo);
-    dispatch(addOrg({
+    dispatch(changeOrgInfo({
       id: data[0].id,
       role: 'ADMIN',
       ...info,
     }));
-    dispatch(initialize({}));
+    dispatch(setLastFetch({}));
     onSuccess(data);
   }
 };
@@ -74,8 +77,8 @@ export const upsertAnOrg = async ({
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
-    dispatch(changeOrg(newData[0]));
-    dispatch(initialize({}));
+    dispatch(changeOrgInfo(newData[0]));
+    dispatch(setLastFetch({}));
     onLoad(newData);
   } else if (error) {
     onError(error);
@@ -135,11 +138,11 @@ export const queryOrgs = async ({
           profile: org.profile || [],
         });
       });
-      dispatch(setOrgs(tmp));
+      dispatch(setOrgsInfo(tmp));
+      dispatch(setLastFetch({}));
       onSuccess(tmp);
   } else {
     onError(error);
   }
   dispatch(finishLoading({}));
-  dispatch(initialize({}));
 };

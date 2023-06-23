@@ -149,3 +149,7 @@ html body {
 .ant-card-actions svg {
   display: inline-block;
 }
+
+.ant-btn-primary {
+  background-color: #7c3aed !important;
+}

@@ -7,7 +7,7 @@ import { isSelected, renderValidateStatus } from '@utils/helpers';
 import ThreeDots from '@assets/icons/svg-icons/ThreeDots';
 import { AlertMessage, SelectBoxOption } from 'types/common';
 import ArrowDownIcon from '@assets/icons/svg-icons/ArrowDownIcon';
-import { IRole } from 'types/member';
+import { IRole } from '@types';
 import TrashCan from '@assets/icons/svg-icons/TrashCan';
 import { Modal } from 'antd';
 import XCircle from '@assets/icons/svg-icons/XCircle';

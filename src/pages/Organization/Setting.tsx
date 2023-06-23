@@ -4,8 +4,8 @@ import { BoxPlotOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons
 import { Tabs } from 'antd';
 import { deleteWeb2Integration, queryWeb2Integration } from '@middleware/data';
 import { useParams } from 'react-router-dom';
-import { extractIdFromIdString } from '@utils/helpers';
-import { IIntegration } from './interface';
+import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
+import { IWeb2Integration } from '@types';
 import Member from './setting/Member';
 import Integration from './setting/Integration';
 import Role from './setting/Role';
@@ -13,17 +13,19 @@ import Role from './setting/Role';
 const Setting = () => {
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
-  const { web2Integrations } = useSelector((state:any) => state.ui);
-  const [integrations, setIntegrations] = useState<IIntegration[]>(web2Integrations);
+  const { web2Integrations, lastFetch } = useSelector((state:any) => state.integration);
+  const [integrations, setIntegrations] = useState<IWeb2Integration[]>(web2Integrations);
   useEffect(() => {
-    queryWeb2Integration({
-      orgId: extractIdFromIdString(orgIdString),
-      onLoad: (data) => {
-        setIntegrations(data);
-      },
-      dispatch,
-    });
-  }, []);
+    if (!shouldUseCachedData(lastFetch)) {
+      queryWeb2Integration({
+        orgId: extractIdFromIdString(orgIdString),
+        onLoad: (data) => {
+          setIntegrations(data);
+        },
+        dispatch,
+      });
+    }
+  }, [web2Integrations, lastFetch]);
   const tabs = [
     {
       key: 'setting',

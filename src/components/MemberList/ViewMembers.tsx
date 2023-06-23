@@ -10,7 +10,7 @@ import { SelectBoxOption } from 'types/common';
 import XCircle from '@assets/icons/svg-icons/XCircle';
 import { sliceAddressToken, unsecuredCopyToClipboard } from '@utils/helpers';
 import { Tooltip } from 'antd';
-import { IMember, IRole } from 'types/member';
+import { IMember, IRole } from '@types';
 
 type Props = {
   closeModal?: () => void;

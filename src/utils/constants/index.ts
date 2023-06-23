@@ -18,6 +18,3 @@ export enum ECardEnumType {
   INITIATIVE = 'initiatives',
   PROPOSAL = 'proposals',
 }
-
-export const TWITTER_CLIENT_ID = 'NFJVLWpSOVg4TlZwdk5BOWhfZ2Y6MTpjaQ';
-export const TWITTER_BASE_URL = 'https://oauth-twitter-0xk2-sync-vote.vercel.app/api/oauth2';

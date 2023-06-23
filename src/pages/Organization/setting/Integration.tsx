@@ -2,10 +2,11 @@ import { DeleteOutlined, GoogleOutlined, TwitterOutlined } from '@ant-design/ico
 import Discord from '@assets/icons/svg-icons/Discord';
 import { Button, Space } from 'antd';
 import moment from 'moment';
-import { TWITTER_CLIENT_ID, TWITTER_BASE_URL } from '@utils/constants';
 import { useParams } from 'react-router-dom';
 import { extractIdFromIdString } from '@utils/helpers';
-import { IIntegration } from '../interface';
+import { IWeb2Integration } from '@types';
+
+const { TWITTER_CLIENT_ID, TWITTER_BASE_URL } = import.meta.env;
 
 const Twitter = ({
   username, refresh_token_expires_at, updated_at, id, onDelete,
@@ -117,7 +118,7 @@ const Integration = ({
           <h3>Active authentication</h3>
           <div className="mt-2">
             {
-              integrations.map((integration:IIntegration) => {
+              integrations.map((integration:IWeb2Integration) => {
                 return (integration.provider === 'twitter' ?
                     (
                       <div key={integration.id}>

@@ -5,7 +5,6 @@ import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import Button from '@components/Button/Button';
 import { useNavigate } from 'react-router-dom';
 import { L } from '@utils/locales/L';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import { useClickOutside } from '@utils/hooks/useClickOutSide';
 import './styles.scss';
 import { OrgPresetBanner } from '@utils/constants/organization';
@@ -36,11 +35,6 @@ const BannerDashBoard = ({
   const navigate = useNavigate();
   const [shouldShowModal, setShouldShowModal] = useState(false);
 
-  const handleNavigate = () => {
-    const { ROOT, SELECT_TEMPLATE } = PAGE_ROUTES.WORKFLOW;
-    const path = `/${ROOT}/${SELECT_TEMPLATE}/${createIdString(org.title, org.id)}`;
-    navigate(path, { state: 'BUILD' });
-  };
   let bannerUrl = org.banner_url ? org.banner_url : `preset:${OrgPresetBanner}`;
   bannerUrl = getImageUrl({
     filePath: bannerUrl.indexOf('preset:') === 0 ? bannerUrl.replace('preset:', '') : bannerUrl, isPreset: bannerUrl.indexOf('preset:') === 0, type: 'banner',
@@ -144,7 +138,9 @@ const BannerDashBoard = ({
               startIcon={<PlusIcon />}
               className="bg-white text-violet-version-5 py-[12px] px-[16px] border-[1.5px] border-solid border-[#5D23BB] !text-[17px] h-[48px]"
               variant="text"
-              onClick={handleNavigate}
+              onClick={() => {
+                navigate(`/${createIdString(org.title, org.id.toString())}/new-workflow`);
+              }}
             >
               {L('newBlueprint')}
             </Button>
@@ -170,7 +166,7 @@ const BannerDashBoard = ({
                     <li>
                       <div
                         onClick={() => {
-                          navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${createIdString(org.title, org.id.toString())}/${PAGE_ROUTES.INITIATIVE.CHOOSE_WORKFLOW}`);
+                          navigate(`/${createIdString(org.title, org.id.toString())}/new-mission`);
                         }}
                         className="block py-[26px] px-[16px] text-[16px] hover:bg-gray-100 hover:rounded-tl-lg hover:rounded-tr-lg cursor-pointer"
                       >

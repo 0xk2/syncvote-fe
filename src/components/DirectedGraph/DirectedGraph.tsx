@@ -62,36 +62,20 @@ const Flow = ({
       fitView
     >
       <Controls
-        position={editable ? 'top-right' : 'top-left'}
+        position="top-right"
       />
       <Background color="#aaa" variant={BackgroundVariant.Dots} />
-      {
-        !editable ?
-        (
-          <Panel position="top-left">
-            <Space direction="horizontal">
-              <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
-              <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
-            </Space>
-          </Panel>
-        )
-        :
-        (
-          <>
-            <Panel position="top-left">
-              <Space direction="horizontal">
-                {navPanel}
-              </Space>
-            </Panel>
-            <Panel position="bottom-left">
-              <Space direction="horizontal">
-                <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
-                <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
-              </Space>
-            </Panel>
-          </>
-        )
-      }
+      <Panel position="top-left">
+        <Space direction="horizontal">
+          {navPanel}
+        </Space>
+      </Panel>
+      <Panel position="bottom-left">
+        <Space direction="horizontal">
+          <Button className="flex items-center" type="default" icon={<VerticalAlignMiddleOutlined />} onClick={onResetPosition}>Reset Position</Button>
+          <Button className="flex items-center" type="default" icon={<PlusOutlined />} onClick={onAddNewNode} disabled={!editable}>Add CheckPoint</Button>
+        </Space>
+      </Panel>
     </ReactFlow>
   );
 };

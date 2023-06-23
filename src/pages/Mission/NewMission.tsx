@@ -1,14 +1,12 @@
 import {
   queryWorkflow, upsertAMission,
 } from '@middleware/data';
-import { createIdString, extractIdFromIdString } from '@utils/helpers';
+import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { Modal, Space, Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
-import { IWorkflowVersion } from '../../types/workflow';
-import { IMission } from '../../types/mission';
+import { IMission, IWorkflowVersion } from '@types';
 import ReviewWorkflow from './fragments/ReviewWorkflow';
 import MissionMeta from './fragments/MissionMeta';
 
@@ -19,7 +17,7 @@ const NewMission = () => {
   const {
     orgIdString, workflowIdString, versionIdString,
   } = useParams();
-  const { workflows, initialized } = useSelector((state: any) => state.ui);
+  const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
   const workflowId = extractIdFromIdString(workflowIdString);
   const orgId = extractIdFromIdString(orgIdString);
   const [currentScreen, setCurrentScreen] = useState('review');
@@ -44,7 +42,7 @@ const NewMission = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
-    if (workflowIdString && workflows.length === 0 && initialized === false) {
+    if (workflowIdString && !shouldUseCachedData(lastFetch)) {
       queryWorkflow({
         orgId,
         onLoad: () => {
@@ -72,13 +70,13 @@ const NewMission = () => {
         });
       }
     });
-  }, [workflows, initialized]);
+  }, [workflows, lastFetch]);
   const onSave = async () => {
     await upsertAMission({
       mission: currentMission,
       onLoad: (data) => {
         setCurrentMission(data[0]);
-        navigate(`/${PAGE_ROUTES.INITIATIVE.ROOT}/${orgIdString}/${PAGE_ROUTES.INITIATIVE.MISSION}/${createIdString(data[0].title, data[0].id)}`);
+        navigate(`/${orgIdString}/mission/${createIdString(data[0].title, data[0].id)}`);
         Modal.success({
           title: 'Success',
           content: 'Mission saved successfully',
@@ -107,7 +105,7 @@ const NewMission = () => {
                   type="default"
                   onClick={() => {
                     if (navigate.length === 0) {
-                      navigate(`/${PAGE_ROUTES.ORG_DETAIL}/${orgIdString}`);
+                      navigate(`/${orgIdString}`);
                     } else {
                       navigate(-1);
                     }

@@ -19,7 +19,7 @@ const InviteMember = ({
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
-  const { orgs, user } = useSelector((state:any) => state.ui);
+  const { orgs, user } = useSelector((state:any) => state.orginfo);
   const org = orgs.find((tmp:any) => tmp.id === orgId);
   const handleInvite = async () => {
     queryUserByEmail({

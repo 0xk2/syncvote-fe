@@ -3,8 +3,11 @@ import {
   DirectedGraph, ICheckPoint, getVoteMachine, renderVoteMachineConfigPanel,
 } from '@components/DirectedGraph';
 import { useState } from 'react';
-import { Button, Modal, Space } from 'antd';
+import {
+  Button, Drawer, Modal, Space,
+} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
+import MissionMeta from './MissionMeta';
 
 const Data = ({
   currentMission, onPublish, onUnPublish, onDelete,
@@ -25,9 +28,10 @@ const Data = ({
   const setVersionData = (data:any) => {
     setCurrentMissionData(data);
   };
+  const [showEditInfo, setShowEditInfo] = useState(false);
   return (
-    <Space direction="vertical" className="w-full" size="large">
-      <Space direction="vertical" className="flex w-full">
+    <div className="w-full h-full">
+      <div className="flex w-full h-full">
         <Modal
           open={open}
           onOk={() => { setOpen(false); }}
@@ -44,6 +48,16 @@ const Data = ({
             }}
           />
         </Modal>
+        <Drawer
+          title="Edit Info"
+          open={showEditInfo}
+          onClose={() => { setShowEditInfo(false); }}
+        >
+          <MissionMeta
+            currentMission={currentMission}
+            setCurrentMission={setCurrentMissionData}
+          />
+        </Drawer>
         {renderVoteMachineConfigPanel({
             editable,
             web2Integrations: web2IntegrationsState,
@@ -115,6 +129,49 @@ const Data = ({
           },
         )}
         <DirectedGraph
+          navPanel={(
+            <Space direction="vertical">
+              <div className="flex justify-between px-4 font-bold">{currentMission.title}</div>
+              <Space className="flex justify-between px-4">
+                <Button
+                  type="default"
+                  onClick={() => { setShowEditInfo(true); }}
+                >
+                  Edit Info
+                </Button>
+                {currentMission.status === 'PUBLISHED' ?
+                (
+                  <div>
+                    <span className="mr-4">Development Only:</span>
+                    <Button
+                      type="default"
+                      onClick={onUnPublish}
+                    >
+                      Unpublish
+                    </Button>
+                  </div>
+                )
+                :
+                null
+                }
+                <Button
+                  type="default"
+                  icon={<UploadOutlined />}
+                  disabled={currentMission.status === 'PUBLISHED'}
+                  onClick={onPublish}
+                >
+                  Publish Mission
+                </Button>
+                <Button
+                  type="default"
+                  icon={<DeleteOutlined />}
+                  onClick={onDelete}
+                >
+                  Detele Mission
+                </Button>
+              </Space>
+            </Space>
+          )}
           editable={editable}
           data={versionData}
           selectedNodeId={selectedNodeId}
@@ -160,40 +217,8 @@ const Data = ({
             });
           }}
         />
-        {currentMission.status === 'PUBLISHED' ?
-        (
-          <div>
-            <span className="mr-4">Development Only:</span>
-            <Button
-              type="default"
-              onClick={onUnPublish}
-            >
-              Unpublish
-            </Button>
-          </div>
-        )
-        :
-        null
-        }
-      </Space>
-      <Space className="flex justify-between px-4">
-        <Button
-          type="default"
-          icon={<UploadOutlined />}
-          disabled={currentMission.status === 'PUBLISHED'}
-          onClick={onPublish}
-        >
-          Publish Mission
-        </Button>
-        <Button
-          type="default"
-          icon={<DeleteOutlined />}
-          onClick={onDelete}
-        >
-          Detele Mission
-        </Button>
-      </Space>
-    </Space>
+      </div>
+    </div>
   );
 };
 

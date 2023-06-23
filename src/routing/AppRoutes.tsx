@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 import App from '@App';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PAGE_ROUTES from '@utils/constants/pageRoutes';
 import PageScreen from '@components/HomeScreen/PageScreen';
-import BuildInitiative from '@pages/Mission/ChooseWorkflow';
+import ChooseWorkflow from '@pages/Mission/ChooseWorkflow';
 import ChooseTemplate from '@pages/Workflow/BuildBlueprint/ChooseTemplate';
 import Mission from 'pages/Mission';
+import Workflow from 'pages/Workflow';
 import {
   OrganizationHome,
   OrganizationList,
@@ -20,36 +20,33 @@ import NewMission from '@pages/Mission/NewMission';
 import EditMission from '@pages/Mission/EditMission';
 
 const AppRoutes = () => (
-  <BrowserRouter basename={PAGE_ROUTES.ROOT}>
+  <BrowserRouter basename="/">
     <Routes>
-      <Route path={PAGE_ROUTES.ROOT} element={<App isFullHeight />}>
-        <Route path={PAGE_ROUTES.WORKFLOW.ROOT}>
-          <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<EditVersion />} />
+      <Route path="/" element={<App isFullHeight />}>
+        <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<EditVersion />} />
+        <Route path=":orgIdString/mission/:missionIdString" element={<Mission />}>
+          <Route index element={<EditMission />} />
         </Route>
       </Route>
-      <Route path={PAGE_ROUTES.ROOT} element={<App />}>
-        <Route path={`${PAGE_ROUTES.ORG_DETAIL}/:orgIdString`} element={<OrganizationHome />} />
-        <Route path={`${PAGE_ROUTES.ORG_DETAIL}/:orgIdString/setting`} element={<OrganizationSetting />} />
-        <Route path={PAGE_ROUTES.LOGIN} element={<CreatorLogin />} />
-        <Route path={PAGE_ROUTES.PROPOSAL_OR_BLUEPRINT} element={<PageScreen />} />
+      {/* TODO: login should use different layout */}
+      <Route path="/" element={<App />}>
+        <Route path="login" element={<CreatorLogin />} />
+      </Route>
+      <Route path="/" element={<App />}>
+        {/* TODO: this screen should only once for each new org */}
+        <Route path="onboard" element={<PageScreen />} />
         <Route index element={<OrganizationList />} />
-
-        <Route path={PAGE_ROUTES.INITIATIVE.ROOT} element={<Mission />}>
-          <Route path={`:orgIdString/${PAGE_ROUTES.INITIATIVE.CHOOSE_WORKFLOW}`} element={<BuildInitiative />} />
-          <Route
-            path={`:orgIdString/${PAGE_ROUTES.INITIATIVE.MISSION}/:missionIdString`}
-            element={<EditMission />}
-          />
-          <Route
-            path={`:orgIdString/:workflowIdString/:versionIdString/${PAGE_ROUTES.INITIATIVE.MISSION}`}
-            element={<NewMission />}
-          />
-        </Route>
-
-        <Route path={PAGE_ROUTES.WORKFLOW.ROOT}>
-          <Route path={`:orgIdString/${PAGE_ROUTES.WORKFLOW.EDIT}/:workflowIdString`} element={<BluePrint />} />
-          <Route path=":orgIdString/:workflowIdString/new" element={<NewVersion />} />
-          <Route path={`${PAGE_ROUTES.WORKFLOW.SELECT_TEMPLATE}/:orgIdString`} element={<ChooseTemplate />} />
+        <Route path=":orgIdString">
+          <Route index element={<OrganizationHome />} />
+          <Route path="setting" element={<OrganizationSetting />} />
+          <Route path="new-workflow" element={<ChooseTemplate />} />
+          <Route path="new-mission" element={<ChooseWorkflow />} />
+          <Route path="workflow/:workflowIdString" element={<Workflow />}>
+            <Route index element={<BluePrint />} />
+            <Route path="new-version" element={<NewVersion />} />
+            <Route path=":versionIdString/new-mission" element={<NewMission />} />
+            <Route path=":versionIdString" element={<EditVersion />} />
+          </Route>
         </Route>
       </Route>
     </Routes>
